@@ -68,6 +68,8 @@ void menuprincipal(){
 
 int main(){
 
+    int op = 0;
+
     system("cls");
     printf("Bom dia querido usuario!");
     sleep(3);
