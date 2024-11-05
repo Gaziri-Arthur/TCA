@@ -56,6 +56,8 @@ typedef struct{//e) Encontro
 
 void menuprincipal(){
 
+    int op;
+
     system("cls");
     printf("1. Manter amigo\n");
     printf("2. Manter local\n");
@@ -64,21 +66,23 @@ void menuprincipal(){
     printf("5. Relatórios\n");
     printf("6. Sair\n");
 
+    scanf("%d", &op)
+
 }
 
 int main(){
 
-    int op = 0;
 
     system("cls");
     printf("Bom dia querido usuario!");
-    sleep(3);
     
-    while(op != 7){
-        printf("Digite uma opcao")
+    while(op != 7)
+    {
+        printf("Digite uma opcao");
+
 
     }
-    return 0
+    return 0;
 }
 
 
