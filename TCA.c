@@ -55,6 +55,8 @@ typedef struct{//e) Encontro
     char *descricao;
 }tEncontro;
 
+tEncontro *Lista;
+
 /*void limparbuffer(){
     char c;
 
@@ -81,7 +83,7 @@ void switchprincipal(int op){
 
 void menuprincipal(){
 
-    int op=0, ver = 0;
+    int op = 0, ver = 0;
 
     system("cls");
     printf("Digite:\n");
