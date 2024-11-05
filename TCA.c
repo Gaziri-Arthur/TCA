@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <Windows.h>
 
 typedef struct{//g) horario
     
@@ -51,38 +52,64 @@ typedef struct{//e) Encontro
     tHoraio horario;
     tAmigo *amigos;
     tCategoria *categoria;
-    char *descricao
+    char *descricao;
 }tEncontro;
+
+/*void limparbuffer(){
+    char c;
+
+    while((c = getchar()) != '\n' && c != EOF);
+}*/
+
+int valido(int a){
+    if(a < 1 || a > 6){
+        return 0;
+    }else{
+        return 1;
+    }
+
+}
+
+void switchprincipal(int op){
+
+    switch (op){
+        case 6:
+            exit(1);
+        
+    }
+}
 
 void menuprincipal(){
 
-    int op;
+    int op=0, ver = 0;
 
     system("cls");
-    printf("1. Manter amigo\n");
-    printf("2. Manter local\n");
-    printf("3. Manter categoria\n");
-    printf("4. Manter encontro\n");
-    printf("5. Relatórios\n");
-    printf("6. Sair\n");
-
-    scanf("%d", &op)
+    printf("Digite:\n");
+    printf("1. para manter amigo\n");
+    printf("2. para manter local\n");
+    printf("3. para manter categoria\n");
+    printf("4. para manter encontro\n");
+    printf("5. para Relatórios\n");
+    printf("6. para Sair\n");
+    printf("O que deseja fazer?: ");
+    while(ver == 0){
+        scanf("%d", &op);
+        ver = valido(op);
+        if(ver == 0){
+            printf("Valor invalido! Digite novamente: ");
+        }
+    }
+    switchprincipal(op);
+    
 
 }
 
 int main(){
 
-
     system("cls");
     printf("Bom dia querido usuario!");
-    
-    while(op != 7)
-    {
-        printf("Digite uma opcao");
+    Sleep(3000);
+    menuprincipal();    
 
-
-    }
     return 0;
 }
-
-
