@@ -9,14 +9,12 @@ typedef struct{//g) horario
     int hora;
     int minuto;
 }tHoraio;
-
 typedef struct{//f) data
 
     int ano;
     int mes;
     int dia;
 }tData;
-
 typedef struct{//c) Endereco
 
     char *rua;
@@ -25,12 +23,10 @@ typedef struct{//c) Endereco
     char *cidade;
     char estado;
 }tEndereco;
-
 typedef struct{//d) Categoria
 
     char *categoria;
 }tCategoria;
-
 typedef struct {//a) Amigo
 
     char *nome;
@@ -39,13 +35,11 @@ typedef struct {//a) Amigo
     char *email;
     char *telefone;
 }tAmigo;
-
 typedef struct {//b) Local
 
     char *NOM_encontro;
     tEndereco endereco;
 }tLocal;
-
 typedef struct{//e) Encontro
     
     tData data;
@@ -55,13 +49,13 @@ typedef struct{//e) Encontro
     char *descricao;
 }tEncontro;
 
-tEncontro *Lista;
+tEncontro *Listaencontro = NULL;
+tAmigo *Listaamigo = NULL;
+tLocal *Listalocal = NULL;
+tCategoria *Listacategoria = NULL;
 
-/*void limparbuffer(){
-    char c;
+int Numencontro = 0, Numamigo = 0, Numcategoria = 0, Numlocal = 0;
 
-    while((c = getchar()) != '\n' && c != EOF);
-}*/
 
 int valido(int a){
     if(a < 1 || a > 6){
