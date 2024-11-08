@@ -77,8 +77,6 @@ void switchprincipal(int op){
 
 void menuprincipal(){
 
-    int op = 0, ver = 0;
-
     system("cls");
     printf("Digite:\n");
     printf("1. para manter amigo\n");
@@ -88,24 +86,20 @@ void menuprincipal(){
     printf("5. para Relatórios\n");
     printf("6. para Sair\n");
     printf("O que deseja fazer?: ");
-    while(ver == 0){
-        scanf("%d", &op);
-        ver = valido(op);
-        if(ver == 0){
-            printf("Valor invalido! Digite novamente: ");
-        }
-    }
-    switchprincipal(op);
-    
 
 }
 
 int main(){
 
+    int op = 0, ver = 0;
+
     system("cls");
     printf("Bom dia querido usuario!");
     Sleep(3000);
-    menuprincipal();    
+    menuprincipal();  
+    while(ver == 0)
+    scanf("%d", &op);
+    switchprincipal(op);  
 
     return 0;
 }
