@@ -112,21 +112,22 @@ void editaamigo(){
         system("cls");
         printf("Qual o nome do seu amigo?(atente-se a letras maiusculas): ");
         gets(str);
-        while(ver != 0){
-            for(int i = 0; i < Numamigo; i++){
-                ver = strcmp(Listaamigo[i].nome, nome);
-                if(result != 0){
-                    continue;
-                } else {
-                    return result;
-                }
+        while(ver != 0)
+        {
+            for(int i = 0; i < Numamigo; i++)
+            {
+                ver = strcmp(Listaamigo[i].nome, str);
+                if(ver == 0)
+                {
+                    break;
+                    printf("Amigo encontrado!");
+                    Sleep(1000);
+                    system("cls");
+                }     
+                
             }
-            if(ver == 0){
-                printf("Amigo nao encontrado! Digite novamente: ");
-            } else {
-                printf("Amigo encontrado!");
-                Sleep(1000);
-                system("cls");  
+            if(ver != 0){
+                printf("Amigo Nao encontrado!");
             }
         }
         menueditaamigo(i);
