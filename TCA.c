@@ -5,7 +5,6 @@
 #include <Windows.h>
 #include <stdbool.h>
 #include <ctype.h>
-#define amain int main()
 
 typedef struct
 { // g) horario
@@ -23,11 +22,11 @@ typedef struct
 typedef struct
 { // c) Endereco
 
-    char *rua;
     int numero;
+    char *logradouro;
     char *bairro;
     char *cidade;
-    char estado;
+    char *estado;
 } tEndereco;
 typedef struct
 { // d) Categoria
@@ -37,18 +36,20 @@ typedef struct
 typedef struct
 { // a) Amigo
 
-    char *nome;
     tData nascimento;
+    int id;
+    char *nome;
     char *apelido;
     char *email;
     char *telefone;
-    int id;
+
 } tAmigo;
 typedef struct
 { // b) Local
 
-    char *NOM_encontro;
     tEndereco endereco;
+    char *NOM_encontro;
+
 } tLocal;
 typedef struct
 { // e) Encontro
@@ -57,8 +58,9 @@ typedef struct
     tHoraio horario;
     tAmigo *amigos;
     tCategoria *categoria;
-    char *descricao;
     int Namigos;
+    char *descricao;
+
 } tEncontro;
 
 tEncontro *Listaencontro = NULL;
@@ -68,39 +70,41 @@ tCategoria *Listacategoria = NULL;
 
 int Numencontro = 0, Numamigo = 0, Numcategoria = 0, Numlocal = 0;
 
-//                                            // inicio meio e fim
-void papagaiada();                            // mensagem bonitinha bem homossexual
-void menuprincipal();                         // explode o menu principal
-void orienta();                               // puxa uma verificacao pos menu principal
-void switchprincipal(int op);                 // invoca as funoces manter ou relatorios com um SC.
-void limpamemoria();                          // limpa memoria alocada
+//                            // inicio meio e fim
+void start();                 // "fractal trunk"
+void saudacao();              // bom dia, boa tarde
+void menuprincipal();         // explode o menu principal
+void orienta();               // puxa uma verificacao pos menu principal
+void switchprincipal(int op); // invoca as funoces manter ou relatorios com um SC.
+void limpamemoria();          // limpa memoria alocada
 
-//                                            // funcoes amigo
-void menuamigo();                             // invoca as opcoes de acao para com um amigo
-void switchamigo(char op);                    // switchcase do menu amigo
-void criaamigo();                             // cria amigos
-void orientaexcluiamigo();                    // orienta a exlusao de amigos
-void editaamigo();                            // edita dados dos amigos
-void excluiamigo(int opAmigo);                // lista negra
-void menueditaamigo(int opAmigo);             // "o que deseja fazer com este amigo?"
-void alteraramigo(char editor, int amigo);    // factualmente muda os dados do amigo
-bool validanome(char nome[]);                 // cheks if theres a friend w that name
-bool validarEmail(char *email);               // valida o email do amigo
-int buscaamigonome();                         // buscaamigopelonome
+//                                         // funcoes amigo
+void menuamigo();                          // invoca as opcoes de acao para com um amigo
+void switchamigo(char op);                 // switchcase do menu amigo
+void criaamigo();                          // cria amigos
+void orientaexcluiamigo();                 // orienta a exlusao de amigos
+void editaamigo();                         // edita dados dos amigos
+void excluiamigo(int opAmigo);             // lista negra
+void menueditaamigo(int opAmigo);          // "o que deseja fazer com este amigo?"
+void alteraramigo(char editor, int amigo); // factualmente muda os dados do amigo
+bool validanome(char nome[]);              // cheks if theres a friend w that name
+bool validarEmail(char *email);            // valida o email do amigo
+int buscaamigonome(bool recurs);           // buscaamigopelonome
 
-//                                            // funcoes categoria
-void menucategoria();                         // invoca o menu categorias
-void switchcategoria(char op);                // invoca as opcoes de acao para com uma categoria
-void criacategoria();                         // cria categorias
-//void alteracategoria();                     // altera as categorias
-//void excluicategoria();                     // exclui categorias
+//                             // funcoes categoria
+void menucategoria();          // invoca o menu categoria
+void switchcategoria(char op); // invoca as opcoes de acao para com uma categoria
+void criacategoria();          // cria categorias
+void editacategoria();         // orienta a edicao de categoria
+void alteracategoria(int cat); // edita categorias
+int buscacatnome(bool recurs); // buscacategoriapelonome
 
-
-//                                            // funcoes relatorio
-void menurelatorios();                        // puxa as opcoes de relatorios
-void switchrelatorios(char op);               // invoca as funcoes de relatorio
-void orientarelatorios();                     // escaneia o operador e invoca o switch
-void exibeamigo(bool prolongar);              // printa os amigos e suas informacoes
+//                                         // funcoes relatorio
+void menurelatorios();                     // puxa as opcoes de relatorios
+void switchrelatorios(char op);            // invoca as funcoes de relatorio
+void orientarelatorios();                  // escaneia o operador e invoca o switch
+void exibeamigo(bool prolongar, bool rel); // printa os amigos e suas informacoes
+void exibecategoria(bool rel);             // printa as categorias
 
 //                                            // validacoes
 void verifica_alocacao(void *v);              // verifica se alocacao dinamica deu certo
@@ -109,28 +113,125 @@ bool valido(char a);                          // valida operador do menu princip
 bool valide_data(int dias, int mes, int ano); // valida datas
 bool validasimnao(char op);                   // valida sim e nao
 
-void ERRO(int opErro);                        // mensagem de erro
+void ERRO(int opErro); // mensagem de erro
 
-amain
+int main()
 {
-    papagaiada();
-    limpamemoria();
-    return 0;
+    start();
 }
 
-void alterarcategoria()
+void alteracategoria(int cat)
 {
-    exit(1);
+    char str[100], op = 'a';
+
+    printf("Qual novo nome deseja para sua categoria?: ");
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    Listacategoria[cat].categoria = (char *)malloc((strlen(str) + 1) * sizeof(char));
+    verifica_alocacao(Listacategoria[cat].categoria);
+    strcpy(Listacategoria[cat].categoria, str);
+    printf("Categoria alterada com sucesso!\nDeseja alterar outra categoria?(s/n): ");
+    while(op != 's' && op != 'n')
+    {
+        scanf("%c", &op);
+        if(op != 's' && op != 'n')
+        {
+            ERRO(1);
+        }
+    }
+    bool ver = validasimnao(op);
+    if(ver)
+    {
+        editacategoria();
+    } else {
+        menucategoria();
+    }
+    
+}
+
+void exibecategoria(bool rel)
+{
+
+    system("cls");
+
+    printf("CATEGORIAS:\n\n");
+    for (int i = 0; i < Numcategoria; i++)
+    {
+        printf("Categoria 1: %s\n", Listacategoria[i].categoria);
+    }
+
+    if (rel)
+    {
+        Sleep(1000);
+        printf("Pressione ENTER para voltar: ");
+        while (getchar() != '\n');
+        getchar();
+        menuprincipal();
+    }
+    else
+    {
+        return;
+    }
+}
+void editacategoria()
+{
+    int opCat = 0;
+    char opIn = 'a', editor;
+
+    system("cls");
+    printf("Digite 1 para pesquisar sua categoria pelo nome\n");
+    printf("Digite 2 para exibir a lista de categorias\n");
+    printf("Digite 3 para voltar\n:");
+
+    while (opIn != '1' && opIn != '2' && opIn != '3')
+    {
+        scanf(" %c", &opIn);
+        fflush(stdin);
+        if (opIn != '1' && opIn != '2' && opIn != '3')
+        {
+            ERRO(1);
+        }
+    }
+
+    if (opIn == '1')
+    {
+        int i = buscacatnome(false);
+        alteracategoria(i);
+    }
+
+    switch (opIn)
+    {
+    case '2':
+        printf("Qual categoria deseja editar?: \n");
+        exibecategoria(false);
+        printf("\n: ");
+        while (opCat < 1 || opCat > Numcategoria)
+        {
+            scanf(" %d", &opCat);
+            if (opCat < 1 || opCat > Numcategoria)
+            {
+                ERRO(8);
+            }
+        }
+        opCat--;
+        alteracategoria(opCat);
+        break;
+
+    case '3':
+        menucategoria();
+        break;
+    }
+    menucategoria();
 }
 
 bool validasimnao(char op)
 {
-    if(op == 's')
+    if (op == 's')
     {
         return true;
     }
     return false;
-
 }
 
 void criacategoria()
@@ -152,7 +253,7 @@ void criacategoria()
         verifica_alocacao(Listacategoria);
     }
 
-    printf("Qual nome deseja para sua categoria?");
+    printf("\nQual nome deseja para sua categoria?: ");
     fflush(stdin);
     gets(str);
     fflush(stdin);
@@ -163,20 +264,22 @@ void criacategoria()
     Numcategoria++;
     printf("Categoria adicionada com sucesso!\n");
     printf("Deseja adicionar outra categoria?(s/n): ");
-    while(continuar != 's' && continuar != 'n')
+    while (continuar != 's' && continuar != 'n')
     {
         scanf("%c", &continuar);
-        if(continuar != 's' && continuar != 'n')
+        if (continuar != 's' && continuar != 'n')
         {
             ERRO(1);
         }
     }
     ver = validasimnao(continuar);
 
-    if(ver)
+    if (ver)
     {
         criacategoria();
-    } else {
+    }
+    else
+    {
         menucategoria();
     }
 }
@@ -204,7 +307,6 @@ void menucategoria()
     }
     switchcategoria(op);
     return;
-
 }
 
 void switchcategoria(char op)
@@ -223,7 +325,7 @@ void switchcategoria(char op)
         }
         else
         {
-            //alteracategoria();
+            editacategoria();
             break;
         }
 
@@ -236,16 +338,17 @@ void switchcategoria(char op)
         }
         else
         {
-            //excluicategoria();
+            // excluicategoria();
             break;
         }
 
     case '4':
-        return;
+        menuprincipal();
     }
+    menuprincipal();
 }
 
-void papagaiada()
+void start()
 {
 
     char word[] = "Hello, world!";
@@ -258,8 +361,8 @@ void papagaiada()
     }
     Sleep(1500);
     system("cls");
-    printf("Bom dia querido usuario!");
-    Sleep(2500);
+    saudacao();
+    Sleep(2000);
     menuprincipal();
 }
 
@@ -289,16 +392,31 @@ void switchrelatorios(char op)
         menuprincipal();
         break;
     case '1':
-        if(Numamigo < 1)
+        if (Numamigo < 1)
         {
             system("cls");
             ERRO(7);
             Sleep(1500);
             menurelatorios();
-        } else {
-            exibeamigo(true);
+        }
+        else
+        {
+            exibeamigo(true, true);
         }
         break;
+
+    case '3':
+        if(Numcategoria < 1)
+        {
+            system("cls");
+            ERRO(10);
+            Sleep(1500);
+            menurelatorios();
+        }
+        else
+        {
+            exibecategoria(true)
+        }
     }
 }
 
@@ -314,20 +432,20 @@ void menurelatorios()
     orientarelatorios();
 }
 
-void exibeamigo(bool prolongar)
+void exibeamigo(bool prolongar, bool rel)
 {
 
     system("cls");
-    if (prolongar == false)
+    if (!prolongar)
     {
         printf("AMIGOS:\n\n");
         for (int i = 0; i < Numamigo; i++)
         {
-            printf("%d° amigo: %s;\n", i + 1, Listaamigo[i].nome);
+            printf("%d amigo: %s\n", i + 1, Listaamigo[i].nome);
         }
     }
 
-    else if (prolongar == true)
+    else if (prolongar)
     {
         printf("AMIGOS:\n\n");
         for (int i = 0; i < Numamigo; i++)
@@ -341,12 +459,19 @@ void exibeamigo(bool prolongar)
         }
     }
 
-    Sleep(1000);
-    printf("Pressione ENTER para continuar: ");
-    while (getchar() != '\n')
-        ;
-    getchar();
-    menuprincipal();
+    if (rel)
+    {
+        Sleep(1000);
+        printf("Pressione ENTER para voltar: ");
+        while (getchar() != '\n')
+            ;
+        getchar();
+        menurelatorios();
+    }
+    else
+    {
+        return;
+    }
 }
 
 void editaamigo()
@@ -371,7 +496,7 @@ void editaamigo()
     switch (opIn)
     {
     case '1':
-        i = buscaamigonome();
+        i = buscaamigonome(false);
         menueditaamigo(i);
         while (editor != '1' && editor != '2' && editor != '3' && editor != '4' && editor != '5')
         {
@@ -385,8 +510,8 @@ void editaamigo()
         break;
 
     case '2':
-        printf("Qual amigo deseja editar?: \n");
-        exibeamigo(false);
+        printf("Qual o numero do amigo que deseja editar?: \n");
+        exibeamigo(false, false);
         while (opAmigo < 1 || opAmigo > Numamigo)
         {
             scanf(" %d", &opAmigo);
@@ -408,11 +533,10 @@ void editaamigo()
         alteraramigo(editor, opAmigo);
         break;
 
-    case '3':
+    default:
         menuamigo();
         break;
     }
-    menuamigo();
 }
 
 void alteraramigo(char editor, int amigo)
@@ -524,8 +648,9 @@ void excluiamigo(int opAmigo)
     Numamigo--;
     Listaamigo = (tAmigo *)realloc(Listaamigo, Numamigo * sizeof(tAmigo)); // realloca a Lista para o novo tamanho de Numamigo
     verifica_alocacao(Listaamigo);
-    printf("Amigo excluído com sucesso!\n");
-    return;
+    printf("Amigo excluido com sucesso!\n");
+    Sleep(2000);
+    menuamigo();
 }
 
 void orientaexcluiamigo()
@@ -539,10 +664,10 @@ void orientaexcluiamigo()
     printf("Digite 2 para exibir a lista de amigos\n");
     printf("Digite 3 para voltar\n:");
 
-    while (opIn != '1' && opIn != '2')
+    while (opIn != '1' && opIn != '2' && opIn != '3')
     {
         scanf(" %c", &opIn);
-        if (opIn != '1' && opIn != '2')
+        if (opIn != '1' && opIn != '2' && opIn != '3')
         {
             printf("Operador invalido! Digite novamente: ");
         }
@@ -550,15 +675,15 @@ void orientaexcluiamigo()
 
     if (opIn == '1')
     {
-        opAmigo = buscaamigonome();
+        opAmigo = buscaamigonome(false);
         excluiamigo(opAmigo);
     }
 
     if (opIn == '2')
     {
 
-        printf("Qual o numero do amigo que deseja excluir? (de 1 a %d): ", Numamigo);
-        exibeamigo(false);
+        printf("Qual o numero do amigo que deseja excluir?: ");
+        exibeamigo(false, false);
 
         while (opAmigo < 1 || opAmigo > Numamigo)
         {
@@ -572,7 +697,11 @@ void orientaexcluiamigo()
         excluiamigo(opAmigo);
     }
 
-    menuamigo();
+    if(opIn == '3')
+    {
+        menuamigo();
+    }
+    
 }
 
 void limpamemoria()
@@ -588,7 +717,7 @@ void limpamemoria()
     }
     free(Listaamigo);
 
-    for(int i = 0; i < Numcategoria; i++)
+    for (int i = 0; i < Numcategoria; i++)
     {
         free(Listacategoria[i].categoria);
     }
@@ -600,6 +729,7 @@ void limpamemoria()
         printf("%c", word[i]);
         Sleep(80);
     }
+    exit(0);
 }
 
 bool validasubmenu(char a)
@@ -620,7 +750,8 @@ void verifica_alocacao(void *v)
     if (!v)
     {
         ERRO(4);
-        exit(1);
+        Sleep(1000);
+        limpamemoria();
     }
 }
 
@@ -702,7 +833,6 @@ bool valide_data(int dias, int mes, int ano)
 void criaamigo()
 {
 
-    // int i, j, k;
     char str[100];
     bool ver = false;
 
@@ -881,7 +1011,7 @@ void switchprincipal(int op)
         break;
 
     case '3':
-        menucategoria();    
+        menucategoria();
     }
 }
 
@@ -926,50 +1056,85 @@ bool validanome(char nome[])
     for (int i = 0; i < Numamigo; i++)
     {
         int ver = strcmp(nome, Listaamigo[i].nome);
-        if (ver != 0)
+        if (ver == 0)
         {
             return false;
         }
     }
-
     return true;
 }
 
-int buscaamigonome()
+int buscaamigonome(bool recurs)
+{
+    int ver = 1, i;
+    char str[100];
+
+    if(!recurs)
+    {
+        system("cls");
+        printf("Qual o nome do seu amigo?(atente-se a letras maiusculas): ");
+    }
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    printf("Buscando");
+    for (int j = 0; j < 3; j++)
+    {
+        printf(".");
+        Sleep(400);
+    }
+    system("cls");
+    for (i = 0; i < Numamigo; i++)
+    {
+        ver = strcmp(Listaamigo[i].nome, str);
+        if (ver == 0)
+        {
+            printf("Amigo encontrado!");
+            Sleep(1000);
+            system("cls");
+            return i;
+        }
+    }
+
+    ERRO(3);
+    Sleep(1500);
+    return buscaamigonome(true);
+}
+
+int buscacatnome(bool recurs)
 {
     int ver = 0, i;
     char str[100];
 
-    while (ver != 0)
+    if(!recurs)
     {
         system("cls");
-        printf("Qual o nome do seu amigo?(atente-se a letras maiusculas): ");
-        gets(str);
-        printf("Buscando");
-        for (i = 0; i < 3; i++)
+        printf("Qual o nome de sua categoria?(atente-se a letras maiusculas): ");
+    }
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    printf("Buscando");
+    for (i = 0; i < 3; i++)
+    {
+        Sleep(400);
+        printf(".");
+    }
+    system("cls");
+    for (i = 0; i < Numcategoria; i++)
+    {
+        ver = strcmp(Listacategoria[i].categoria, str);
+        if (ver == 0)
         {
-            Sleep(400);
-            printf(".");
-        }
-        system("cls");
-        for (i = 0; i < Numamigo; i++)
-        {
-            ver = strcmp(Listaamigo[i].nome, str);
-            if (ver == 0)
-            {
-                printf("Amigo encontrado!");
-                Sleep(1000);
-                system("cls");
-                break;
-            }
-        }
-        if (ver != 0)
-        {
-            ERRO(3);
-            Sleep(2000);
+            printf("Categoria encontrada!");
+            Sleep(1000);
+            system("cls");
+            return i;
         }
     }
-    return i;
+
+    ERRO(3);
+    return buscacatnome(true);
 }
 
 void ERRO(int opErro)
@@ -984,10 +1149,10 @@ void ERRO(int opErro)
         printf("Amigo invalido! Digite novamente: ");
         break;
     case 3:
-        printf("Amigo nao encontrado!");
+        printf("Amigo nao encontrado! Digite novamente: ");
         break;
     case 4:
-        printf("Erro ao alocar memoria!");
+        printf("ERRO AO ALOCAR MEMORIA!!!");
         break;
     case 5:
         printf("Nao existem amigos para serem editados!");
@@ -998,5 +1163,51 @@ void ERRO(int opErro)
     case 7:
         printf("Nao existem amigos para serem listados!");
         break;
+    case 8:
+        printf("Categoria invalida! Digite novamente: ");
+        break;
+    case 9: 
+        printf("Categotria nao encontrada! Digite novamente: ");
+        break;
+    case 10:
+        printf("Nao existem categorias para serem listadas!");
+    }
+}
+
+void saudacao()
+{
+    time_t t;
+    struct tm *info;
+
+    char bd[] = "Bom dia, querido usuario!", bt[] = "Boa tarde, querido usuario!", bn[] = "Boa noite, querido usuario!";
+
+    time(&t);             // Obtém o tempo atual em formato bruto
+    info = localtime(&t); // Converte para horário local
+
+    int hora = info->tm_hour; // Obtém a hora atual
+
+    if (hora >= 6 && hora < 12)
+    {
+        for (int i = 0; bd[i] != '\0'; i++)
+        {
+            printf("%c", bd[i]);
+            Sleep(60);
+        }
+    }
+    else if (hora >= 12 && hora < 18)
+    {
+        for (int i = 0; bt[i] != '\0'; i++)
+        {
+            printf("%c", bt[i]);
+            Sleep(60);
+        }
+    }
+    else
+    {
+        for (int i = 0; bn[i] != '\0'; i++)
+        {
+            printf("%c", bn[i]);
+            Sleep(60);
+        }
     }
 }
