@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <stdbool.h>
 #include <ctype.h>
+#define CLS printf("\033[2J\033[1;1H");
+
 
 typedef struct
 { // g) horario
@@ -22,16 +24,18 @@ typedef struct
 typedef struct
 { // c) Endereco
 
-    int numero;
+    char *numero;
     char *logradouro;
     char *bairro;
     char *cidade;
     char *estado;
+
 } tEndereco;
 typedef struct
 { // d) Categoria
 
     char *categoria;
+    int id;
 } tCategoria;
 typedef struct
 { // a) Amigo
@@ -47,8 +51,9 @@ typedef struct
 typedef struct
 { // b) Local
 
+    int id;
     tEndereco endereco;
-    char *NOM_encontro;
+    char *nomelocal;
 
 } tLocal;
 typedef struct
@@ -56,7 +61,7 @@ typedef struct
 
     tData data;
     tHoraio horario;
-    tAmigo *amigos;
+    tAmigo **amigos;
     tCategoria *categoria;
     int Namigos;
     char *descricao;
@@ -72,13 +77,11 @@ int Numencontro = 0, Numamigo = 0, Numcategoria = 0, Numlocal = 0;
 
 //                            // inicio meio e fim
 void start();                 // "fractal trunk"
-void saudacao();              // bom dia, boa tarde
 void menuprincipal();         // explode o menu principal
 void orienta();               // puxa uma verificacao pos menu principal
 void switchprincipal(int op); // invoca as funoces manter ou relatorios com um SC.
 void limpamemoria();          // limpa memoria alocada
-
-//                                         // funcoes amigo
+//
 void menuamigo();                          // invoca as opcoes de acao para com um amigo
 void switchamigo(char op);                 // switchcase do menu amigo
 void criaamigo();                          // cria amigos
@@ -89,35 +92,506 @@ void menueditaamigo(int opAmigo);          // "o que deseja fazer com este amigo
 void alteraramigo(char editor, int amigo); // factualmente muda os dados do amigo
 bool validanome(char nome[]);              // cheks if theres a friend w that name
 bool validarEmail(char *email);            // valida o email do amigo
-int buscaamigonome(bool recurs);           // buscaamigopelonome
-
-//                             // funcoes categoria
+int buscaxnome(int op);                    // buscapelonome
+//
 void menucategoria();          // invoca o menu categoria
 void switchcategoria(char op); // invoca as opcoes de acao para com uma categoria
 void criacategoria();          // cria categorias
 void editacategoria();         // orienta a edicao de categoria
 void alteracategoria(int cat); // edita categorias
-int buscacatnome(bool recurs); // buscacategoriapelonome
-
-//                                         // funcoes relatorio
+void orientaexcluicat();       // orienta a exclusao de categorias
+void excluicat(int opCat);     // exclui categorias
+//
+void menulocal();                        // invoca o menu local
+void switchlocal(char op);               // invoca as opcoes de acao para com um local
+void crialocal();                        // cria locais
+void orientaeditalocal();                // orienta a edicao de locais
+void editalocal(char editor, int local); // edita locais
+void orientaexcluilocal();               // orienta a exclusao de locais
+void excluilocal(int opLocal);           // exclui locais
+void menueditalocal(int opLocal);        // "o que deseja fazer com este local?"
+//
 void menurelatorios();                     // puxa as opcoes de relatorios
 void switchrelatorios(char op);            // invoca as funcoes de relatorio
-void orientarelatorios();                  // escaneia o operador e invoca o switch
 void exibeamigo(bool prolongar, bool rel); // printa os amigos e suas informacoes
 void exibecategoria(bool rel);             // printa as categorias
-
-//                                            // validacoes
+void exibelocal(bool prolongar, bool rel); // printa os locais e suas informacoes
+//
 void verifica_alocacao(void *v);              // verifica se alocacao dinamica deu certo
-bool validasubmenu(char a);                   // valida operadores de submenu
-bool valido(char a);                          // valida operador do menu principal
+char valida16();                              // valida operador do menu principal
+char valida14();                              // valida operadoeres 1 a 4
 bool valide_data(int dias, int mes, int ano); // valida datas
-bool validasimnao(char op);                   // valida sim e nao
-
-void ERRO(int opErro); // mensagem de erro
+bool validasimnao();                          // valida sim e nao
+char valida15();                              // valida 1 a 5
+char valida13();                              // valida 1 a 3
+void ERRO(int opErro);                        // mensagem de erro
 
 int main()
 {
     start();
+}
+
+void excluilocal(int opLocal)
+{
+    free(Listalocal[opLocal].endereco.bairro);
+    free(Listalocal[opLocal].endereco.cidade);
+    free(Listalocal[opLocal].endereco.estado);
+    free(Listalocal[opLocal].endereco.logradouro);
+    free(Listalocal[opLocal].endereco.numero);
+    free(Listalocal[opLocal].nomelocal);
+
+    if (opLocal < Numlocal)
+    {
+        for (int i = opLocal; i < Numlocal - 1; i++)
+        {
+            Listalocal[i] = Listalocal[i + 1];
+        }
+    }
+
+    Numlocal--;
+    Listalocal = (tLocal *)realloc(Listalocal, Numlocal * sizeof(tLocal));
+    verifica_alocacao(Listalocal);
+    printf("Local excluido com sucesso!\n");
+    Sleep(2000);
+    menulocal();
+}
+
+void orientaexcluilocal()
+{
+    int opLocal;
+
+    CLS
+        printf("Digite 1 para pesquisar seu local pelo nome\n");
+    printf("Digite 2 para exibir a lista de locais\n");
+    printf("Digite 3 para voltar\nDigite a opcao:");
+
+    char opIn = valida13();
+
+    if (opIn == '1')
+    {
+        opLocal = buscaxnome(2);
+        excluilocal(opLocal);
+    }
+    else if (opIn == '2')
+    {
+        printf("Qual o numero do local que deseja excluir?: ");
+        exibelocal(false, false);
+
+        while (opLocal < 1 || opLocal > Numlocal)
+        {
+            scanf(" %d", &opLocal);
+            if (opLocal < 1 || opLocal >= Numlocal)
+            {
+                ERRO(19);
+            }
+        }
+        opLocal--;
+        excluilocal(opLocal);
+    }
+    else
+    {
+        return;
+    }
+}
+
+void editalocal(char editor, int local)
+{
+
+    char str[100];
+    CLS
+
+        switch (editor)
+    {
+    case '1':
+        printf("Qual o novo nome de %s?: ", Listalocal[local].nomelocal);
+        fflush(stdin);
+        gets(str);
+        fflush(stdin);
+        Listalocal[local].nomelocal = (char *)malloc((strlen(str) + 1) * sizeof(char));
+        verifica_alocacao(Listalocal[local].nomelocal);
+        strcpy(Listalocal[local].nomelocal, str);
+        break;
+
+    case '2':
+        printf("Qual o novo estado para seu encontro?: ");
+        fflush(stdin);
+        gets(str);
+        fflush(stdin);
+        Listalocal[local].endereco.estado = (char *)malloc((strlen(str) + 1) * sizeof(char));
+        verifica_alocacao(Listalocal[local].endereco.estado);
+        strcpy(Listalocal[local].endereco.estado, str);
+        printf("Qual a nova cidade para seu encontro?: ");
+        fflush(stdin);
+        gets(str);
+        fflush(stdin);
+        Listalocal[local].endereco.cidade = (char *)malloc((strlen(str) + 1) * sizeof(char));
+        verifica_alocacao(Listalocal[local].endereco.cidade);
+        strcpy(Listalocal[local].endereco.cidade, str);
+        printf("Qual o novo bairro para seu encontro?: ");
+        fflush(stdin);
+        gets(str);
+        fflush(stdin);
+        Listalocal[local].endereco.bairro = (char *)malloc((strlen(str) + 1) * sizeof(char));
+        verifica_alocacao(Listalocal[local].endereco.bairro);
+        strcpy(Listalocal[local].endereco.bairro, str);
+        printf("Qual o novo logradouro para seu encontro?: ");
+        fflush(stdin);
+        gets(str);
+        fflush(stdin);
+        Listalocal[local].endereco.logradouro = (char *)malloc((strlen(str) + 1) * sizeof(char));
+        verifica_alocacao(Listalocal[local].endereco.logradouro);
+        strcpy(Listalocal[local].endereco.logradouro, str);
+        printf("Qual o novo numero para seu encontro?: ");
+        gets(str);
+        fflush(stdin);
+        Listalocal[local].endereco.numero = (char *)malloc((strlen(str) + 1) * sizeof(char));
+        verifica_alocacao(Listalocal[local].endereco.numero);
+        strcpy(Listalocal[local].endereco.numero, str);
+        break;
+
+    case '3':
+        printf("Qual o novo numero para seu encontro?: ");
+        fflush(stdin);
+        gets(str);
+        fflush(stdin);
+        Listalocal[local].endereco.numero = (char *)malloc((strlen(str) + 1) * sizeof(char));
+        verifica_alocacao(Listalocal[local].endereco.numero);
+        strcpy(Listalocal[local].endereco.numero, str);
+        break;
+    }
+    CLS
+        printf("Local Editado com sucesso!");
+    Sleep(1500);
+    menulocal();
+}
+
+void menueditalocal(int opLocal)
+{
+
+    CLS
+        printf("Digite 1 para alterar o nome (%s)\n", Listalocal[opLocal].nomelocal);
+    printf("Digite 2 para alterar a endereco %s, %s, %s, %s, %s\n", Listalocal[opLocal].endereco.estado, Listalocal[opLocal].endereco.cidade, Listalocal[opLocal].endereco.bairro, Listalocal[opLocal].endereco.logradouro, Listalocal[opLocal].endereco.numero);
+    printf("Digite 3 para alterar o numero (%s)\n", Listalocal[opLocal].endereco.numero);
+}
+char valida13()
+{
+    char opIn;
+    do
+    {
+        scanf(" %c", &opIn);
+        if (opIn != '1' && opIn != '2' && opIn != '3')
+        {
+            ERRO(1);
+        }
+    }
+    while (opIn != '1' && opIn != '2' && opIn != '3')
+        ;
+
+    return opIn;
+}
+
+char valida14()
+{
+    char opIn;
+    do
+    {
+        scanf(" %c", &opIn);
+        if (opIn != '1' && opIn != '2' && opIn != '3' && opIn != '4')
+        {
+            ERRO(1);
+        }
+    }
+    while (opIn != '1' && opIn != '2' && opIn != '3' && opIn != '4')
+        ;
+
+    return opIn;
+}
+
+char valida15()
+{
+    char op;
+    do
+    {
+        scanf(" %c", &op);
+        if (op != '1' && op != '2' && op != '3' && op != '4' && op != '5')
+        {
+            ERRO(1);
+        }
+    }
+    while (op != '1' && op != '2' && op != '3' && op != '4' && op != '5')
+        ;
+
+    return op;
+}
+void exibelocal(bool prolongar, bool rel)
+{
+    CLS
+
+        if (!prolongar)
+    {
+        printf("LOCAIS:\n\n");
+        for (int i = 0; i < Numlocal; i++)
+        {
+            printf("%d Local: %s\n", i + 1, Listalocal[i].nomelocal);
+        }
+    }
+
+    else if (prolongar)
+    {
+        printf("LOCAIS:\n\n");
+        for (int i = 0; i < Numlocal; i++)
+        {
+            printf("\nLocal %d: \n", i + 1);
+            printf("Nome: %s\n", Listalocal[i].nomelocal);
+            printf("Endereco: %s, %s, %s, %s, %s\n", Listalocal[i].endereco.logradouro, Listalocal[i].endereco.numero, Listalocal[i].endereco.bairro, Listalocal[i].endereco.cidade, Listalocal[i].endereco.estado);
+        }
+    }
+
+    if (rel)
+    {
+        Sleep(1000);
+        printf("Pressione ENTER para voltar: ");
+        while (getchar() != '\n')
+            ;
+        getchar();
+        menurelatorios();
+    }
+    else
+    {
+        return;
+    }
+}
+
+void orientaeditalocal()
+{
+    int opLocal = 0;
+    char editor;
+
+    CLS
+        printf("Digite 1 para pesquisar seu local pelo nome\n");
+    printf("Digite 2 para exibir a lista de locais\n");
+    printf("Digite 3 para voltar\nDigite a opcao: ");
+    char opIn = valida13();
+
+    if (opIn == '1')
+    {
+        opLocal = buscaxnome(2);
+        menueditalocal(opLocal);
+        printf("\n\nDigite para alterar: ");
+        editor = valida13();
+        editalocal(editor, opLocal);
+    }
+    else if (opIn == '2')
+    {
+        exibelocal(false, false);
+        printf("Qual o numero do local que deseja editar?: ");
+        while (opLocal < 1 || opLocal > Numlocal)
+        {
+            scanf(" %d", &opLocal);
+            if (opLocal < 1 || opLocal > Numlocal)
+            {
+                ERRO(19);
+            }
+        }
+        opLocal--;
+        menueditalocal(opLocal);
+        printf("\n\nDigite para alterar: ");
+        editor = valida13();
+        editalocal(editor, opLocal);
+    }
+    else
+    {
+        return;
+    }
+}
+
+void crialocal()
+{
+    char str[100];
+
+    CLS
+        printf("Voce tem %d locais no momento\n\n", Numlocal);
+
+    if (Numlocal == 0)
+    {
+        Listalocal = (tLocal *)malloc(1 * sizeof(tLocal));
+        verifica_alocacao(Listalocal);
+    }
+    else
+    {
+
+        Listalocal = (tLocal *)realloc(Listalocal, (Numlocal + 1) * sizeof(tLocal));
+        verifica_alocacao(Listalocal);
+    }
+
+    printf("Em qual estado sera seu encontro?: ");
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    Listalocal[Numlocal].endereco.estado = (char *)malloc((strlen(str) + 1) * sizeof(char));
+    verifica_alocacao(Listalocal[Numlocal].endereco.estado);
+    strcpy(Listalocal[Numlocal].endereco.estado, str);
+
+    printf("Em qual cidade sera seu encontro?: ");
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    Listalocal[Numlocal].endereco.cidade = (char *)malloc((strlen(str) + 1) * sizeof(char));
+    verifica_alocacao(Listalocal[Numlocal].endereco.cidade);
+    strcpy(Listalocal[Numlocal].endereco.cidade, str);
+
+    printf("Em qual bairro sera seu encontro?: ");
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    Listalocal[Numlocal].endereco.bairro = (char *)malloc((strlen(str) + 1) * sizeof(char));
+    verifica_alocacao(Listalocal[Numlocal].endereco.bairro);
+    strcpy(Listalocal[Numlocal].endereco.bairro, str);
+
+    printf("Qual o logradouro ser seu encontro?: ");
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    Listalocal[Numlocal].endereco.logradouro = (char *)malloc((strlen(str) + 1) * sizeof(char));
+    verifica_alocacao(Listalocal[Numlocal].endereco.logradouro);
+    strcpy(Listalocal[Numlocal].endereco.logradouro, str);
+
+    printf("Qual o numero para seu encontro?: ");
+    gets(str);
+    fflush(stdin);
+    Listalocal[Numlocal].endereco.numero = (char *)malloc((strlen(str) + 1) * sizeof(char));
+    verifica_alocacao(Listalocal[Numlocal].endereco.numero);
+    strcpy(Listalocal[Numlocal].endereco.numero, str);
+
+    printf("Qual o nome do seu local?: ");
+    fflush(stdin);
+    gets(str);
+    fflush(stdin);
+    Listalocal[Numlocal].nomelocal = (char *)malloc((strlen(str) + 1) * sizeof(char));
+    strcpy(Listalocal[Numlocal].nomelocal, str);
+
+    Numlocal++;
+    CLS
+        printf("Local criado com sucesso!");
+    Sleep(1000);
+
+    menulocal();
+}
+
+void switchlocal(char op)
+{
+    switch (op)
+    {
+    case '1':
+        crialocal();
+        break;
+    case '2':
+        if (Numlocal < 1)
+        {
+            ERRO(21);
+        }
+        else
+        {
+            orientaeditalocal();
+        }
+        break;
+    case '3':
+        if (Numlocal < 1)
+        {
+            ERRO(22);
+        }
+        else
+        {
+            orientaexcluilocal();
+        }
+
+        break;
+    case '4':
+        menuprincipal();
+    }
+    return;
+}
+
+void menulocal()
+{
+
+    CLS
+        printf("***MENU LOCAL***\n\nDigite:\n");
+    printf("1 para criar um local\n");
+    printf("2 para editar um local\n");
+    printf("3 para excluir um local\n");
+    printf("4 para voltar\n");
+    printf("O que deseja fazer?: ");
+    char op = valida14();
+    switchlocal(op);
+    return;
+}
+
+void excluicat(int opCat)
+{
+
+    if (opCat < Numcategoria)
+    {
+        for (int i = opCat; i < Numcategoria - 1; i++)
+        {
+            Listacategoria[i] = Listacategoria[i + 1];
+        }
+    }
+
+    Numcategoria--;
+    Listacategoria = (tCategoria *)realloc(Listacategoria, Numcategoria * sizeof(tCategoria));
+    verifica_alocacao(Listacategoria);
+    printf("Categoria excluida com sucesso!\n");
+    Sleep(2000);
+    return;
+}
+
+void orientaexcluicat()
+{
+    int opCat = 0;
+    char opIn = 'a';
+
+    CLS
+        printf("Digite 1 para pesquisar sua categoria pelo nome\n");
+    printf("Digite 2 para exibir a lista de categorias\n");
+    printf("Digite 3 para voltar\nDigite a opcao:");
+
+    while (opIn != '1' && opIn != '2' && opIn != '3')
+    {
+        scanf(" %c", &opIn);
+        fflush(stdin);
+        if (opIn != '1' && opIn != '2' && opIn != '3')
+        {
+            ERRO(1);
+        }
+    }
+
+    if (opIn == '1')
+    {
+        int i = buscaxnome(3);
+        excluicat(i);
+    }
+    else if (opIn == '2')
+    {
+        CLS
+            printf("Qual categoria deseja excluir?: \n");
+        exibecategoria(false);
+        printf("\n: ");
+        while (opCat < 1 || opCat > Numcategoria)
+        {
+            scanf(" %d", &opCat);
+            if (opCat < 1 || opCat > Numcategoria)
+            {
+                ERRO(8);
+            }
+        }
+        opCat--;
+        excluicat(opCat);
+    }
+    else
+    {
+        return;
+    }
 }
 
 void alteracategoria(int cat)
@@ -132,42 +606,44 @@ void alteracategoria(int cat)
     verifica_alocacao(Listacategoria[cat].categoria);
     strcpy(Listacategoria[cat].categoria, str);
     printf("Categoria alterada com sucesso!\nDeseja alterar outra categoria?(s/n): ");
-    while(op != 's' && op != 'n')
+    while (op != 's' && op != 'n')
     {
         scanf("%c", &op);
-        if(op != 's' && op != 'n')
+        if (op != 's' && op != 'n')
         {
             ERRO(1);
         }
     }
     bool ver = validasimnao(op);
-    if(ver)
+    if (ver)
     {
         editacategoria();
-    } else {
-        menucategoria();
     }
-    
+    else
+    {
+        return;
+    }
 }
 
 void exibecategoria(bool rel)
 {
 
-    system("cls");
+    CLS
 
-    printf("CATEGORIAS:\n\n");
+        printf("CATEGORIAS:\n\n");
     for (int i = 0; i < Numcategoria; i++)
     {
-        printf("Categoria 1: %s\n", Listacategoria[i].categoria);
+        printf("Categoria %d: %s\n", i + 1, Listacategoria[i].categoria);
     }
 
     if (rel)
     {
         Sleep(1000);
         printf("Pressione ENTER para voltar: ");
-        while (getchar() != '\n');
+        while (getchar() != '\n')
+            ;
         getchar();
-        menuprincipal();
+        menurelatorios();
     }
     else
     {
@@ -177,32 +653,21 @@ void exibecategoria(bool rel)
 void editacategoria()
 {
     int opCat = 0;
-    char opIn = 'a', editor;
+    char opIn = 'a';
 
-    system("cls");
-    printf("Digite 1 para pesquisar sua categoria pelo nome\n");
+    CLS
+        printf("Digite 1 para pesquisar sua categoria pelo nome\n");
     printf("Digite 2 para exibir a lista de categorias\n");
-    printf("Digite 3 para voltar\n:");
+    printf("Digite 3 para voltar\nDigite a opcao:");
 
-    while (opIn != '1' && opIn != '2' && opIn != '3')
-    {
-        scanf(" %c", &opIn);
-        fflush(stdin);
-        if (opIn != '1' && opIn != '2' && opIn != '3')
-        {
-            ERRO(1);
-        }
-    }
-
+    opIn = valida13();
     if (opIn == '1')
     {
-        int i = buscacatnome(false);
+        int i = buscaxnome(3);
         alteracategoria(i);
     }
-
-    switch (opIn)
+    else if (opIn == '2')
     {
-    case '2':
         printf("Qual categoria deseja editar?: \n");
         exibecategoria(false);
         printf("\n: ");
@@ -216,17 +681,27 @@ void editacategoria()
         }
         opCat--;
         alteracategoria(opCat);
-        break;
-
-    case '3':
-        menucategoria();
-        break;
     }
-    menucategoria();
+    else
+    {
+        return;
+    }
 }
 
-bool validasimnao(char op)
+bool validasimnao()
 {
+    char op;
+
+    do
+    {
+        fflush(stdin);
+        scanf(" %c", &op);
+        if (op != 's' && op != 'n' && op != 'S' && op != 'N')
+        {
+            ERRO(1);
+        }
+    } while (op != 's' && op != 'n');
+
     if (op == 's')
     {
         return true;
@@ -236,15 +711,14 @@ bool validasimnao(char op)
 
 void criacategoria()
 {
-    char str[100], continuar = 'a';
-    bool ver = false;
+    char str[100];
 
-    system("cls");
-    printf("Voce tem %d categorias no momento\n", Numcategoria);
+    CLS
+        printf("Voce tem %d categorias no momento\n", Numcategoria);
 
     if (Numcategoria == 0)
     {
-        Listacategoria = (tCategoria *)malloc(sizeof(tCategoria));
+        Listacategoria = (tCategoria *)malloc(1 * sizeof(tCategoria));
         verifica_alocacao(Listacategoria);
     }
     else
@@ -252,6 +726,7 @@ void criacategoria()
         Listacategoria = (tCategoria *)realloc(Listacategoria, (Numcategoria + 1) * sizeof(tCategoria));
         verifica_alocacao(Listacategoria);
     }
+    Listacategoria[Numcategoria].id = 0;
 
     printf("\nQual nome deseja para sua categoria?: ");
     fflush(stdin);
@@ -263,48 +738,21 @@ void criacategoria()
 
     Numcategoria++;
     printf("Categoria adicionada com sucesso!\n");
-    printf("Deseja adicionar outra categoria?(s/n): ");
-    while (continuar != 's' && continuar != 'n')
-    {
-        scanf("%c", &continuar);
-        if (continuar != 's' && continuar != 'n')
-        {
-            ERRO(1);
-        }
-    }
-    ver = validasimnao(continuar);
-
-    if (ver)
-    {
-        criacategoria();
-    }
-    else
-    {
-        menucategoria();
-    }
+    return;
+    
 }
 
 void menucategoria()
 {
-    char op;
-    bool ver = false;
 
-    system("cls");
-    printf("***MENU CATEGORIA***\n\nDigite:\n");
+    CLS
+        printf("***MENU CATEGORIA***\n\nDigite:\n");
     printf("1 para criar uma categoria\n");
     printf("2 para editar uma categoria\n");
     printf("3 para excluir uma categoria\n");
     printf("4 para voltar\n");
     printf("O que deseja fazer?: ");
-    while (ver == false)
-    {
-        scanf(" %c", &op);
-        ver = validasubmenu(op);
-        if (ver == false)
-        {
-            ERRO(1);
-        }
-    }
+    char op = valida14();
     switchcategoria(op);
     return;
 }
@@ -338,14 +786,14 @@ void switchcategoria(char op)
         }
         else
         {
-            // excluicategoria();
+            orientaexcluicat();
             break;
         }
 
     case '4':
         menuprincipal();
     }
-    menuprincipal();
+    return;
 }
 
 void start()
@@ -353,34 +801,13 @@ void start()
 
     char word[] = "Hello, world!";
 
-    system("cls");
-    for (int i = 0; word[i] != '\0'; i++)
+    CLS for (int i = 0; word[i] != '\0'; i++)
     {
         printf("%c", word[i]);
         Sleep(100);
     }
     Sleep(1500);
-    system("cls");
-    saudacao();
-    Sleep(2000);
     menuprincipal();
-}
-
-void orientarelatorios()
-{
-
-    char op = 'a';
-
-    while (op != '1' && op != '2' && op != '3' && op != '4' && op != '5')
-    {
-        scanf(" %c", &op);
-        if (op != '1' && op != '2' && op != '3' && op != '4' && op != '5')
-        {
-            printf("Operador invalido! Digite novamente: ");
-        }
-    }
-
-    switchrelatorios(op);
 }
 
 void switchrelatorios(char op)
@@ -394,8 +821,8 @@ void switchrelatorios(char op)
     case '1':
         if (Numamigo < 1)
         {
-            system("cls");
-            ERRO(7);
+            CLS
+                ERRO(7);
             Sleep(1500);
             menurelatorios();
         }
@@ -406,37 +833,51 @@ void switchrelatorios(char op)
         break;
 
     case '3':
-        if(Numcategoria < 1)
+        if (Numcategoria < 1)
         {
-            system("cls");
-            ERRO(10);
+            CLS
+                ERRO(10);
             Sleep(1500);
             menurelatorios();
         }
         else
         {
-            exibecategoria(true)
+            exibecategoria(true);
+        }
+    case '2':
+        if (Numlocal < 1)
+        {
+            CLS
+                ERRO(18);
+            Sleep(1500);
+            menurelatorios();
+        }
+        else
+        {
+            exibelocal(true, true);
         }
     }
+    return;
 }
 
 void menurelatorios()
 {
-    system("cls");
-    printf("***MENU DE RELATORIOS***\n\n");
+    CLS
+        printf("***MENU DE RELATORIOS***\n\n");
     printf("Digite 1 para exibir o relatorio de amigos\n");
     printf("Digite 2 para exibir o relatorio de locais\n");
     printf("Digite 3 para exibir o relatorio de categorias\n");
     printf("Digite 4 para exibir o relatorio de encontros\n");
     printf("Digite 5 para voltar\n: ");
-    orientarelatorios();
+    char op = valida15();
+    switchrelatorios(op);
+    return;
 }
 
 void exibeamigo(bool prolongar, bool rel)
 {
 
-    system("cls");
-    if (!prolongar)
+    CLS if (!prolongar)
     {
         printf("AMIGOS:\n\n");
         for (int i = 0; i < Numamigo; i++)
@@ -477,39 +918,25 @@ void exibeamigo(bool prolongar, bool rel)
 void editaamigo()
 {
     int opAmigo = 0, i = 1;
-    char opIn = 'a', editor;
+    char editor;
 
-    system("cls");
-    printf("Digite 1 para pesquisar seu amigo pelo nome\n");
+    CLS
+        printf("Digite 1 para pesquisar seu amigo pelo nome\n");
     printf("Digite 2 para exibir a lista de amigos\n");
-    printf("Digite 3 para voltar\n:");
+    printf("Digite 3 para voltar\nDigite a opcao:");
 
-    while (opIn != '1' && opIn != '2' && opIn != '3')
-    {
-        scanf(" %c", &opIn);
-        if (opIn != '1' && opIn != '2' && opIn != '3')
-        {
-            printf("Operador invalido! Digite novamente: ");
-        }
-    }
+    char opIn = valida13();
 
-    switch (opIn)
+    if(opIn == '1')
     {
-    case '1':
-        i = buscaamigonome(false);
+        i = buscaxnome(1);
         menueditaamigo(i);
-        while (editor != '1' && editor != '2' && editor != '3' && editor != '4' && editor != '5')
-        {
-            scanf("%c", &editor);
-            if (editor != '1' && editor != '2' && editor != '3' && editor != '4' && editor != '5')
-            {
-                printf("Operador invalido! Digite novamente: ");
-            }
-        }
-        alteraramigo(editor, opAmigo);
-        break;
-
-    case '2':
+        printf("\n\nDigite para editar: ");
+        editor = valida13();
+        alteraramigo(editor, i);
+    }
+    else if(opIn == '2')
+    {
         printf("Qual o numero do amigo que deseja editar?: \n");
         exibeamigo(false, false);
         while (opAmigo < 1 || opAmigo > Numamigo)
@@ -522,20 +949,12 @@ void editaamigo()
         }
         opAmigo--;
         menueditaamigo(opAmigo);
-        while (editor != '1' && editor != '2' && editor != '3' && editor != '4' && editor != '5')
-        {
-            scanf("%c", &editor);
-            if (editor != '1' && editor != '2' && editor != '3' && editor != '4' && editor != '5')
-            {
-                ERRO(1);
-            }
-        }
+        editor = valida15();
         alteraramigo(editor, opAmigo);
-        break;
-
-    default:
-        menuamigo();
-        break;
+    }
+    else
+    {
+        return;
     }
 }
 
@@ -548,7 +967,7 @@ void alteraramigo(char editor, int amigo)
     switch (editor)
     {
     case '1':
-        printf("Qual o novo nome de %s?", Listaamigo[amigo].nome);
+        printf("Qual o novo nome de %s?: ", Listaamigo[amigo].nome);
         fflush(stdin);
         gets(str);
         fflush(stdin);
@@ -557,7 +976,7 @@ void alteraramigo(char editor, int amigo)
         break;
 
     case '2':
-        printf("Qual o novo apelido de %s?", Listaamigo[amigo].nome);
+        printf("Qual o novo apelido de %s?: ", Listaamigo[amigo].nome);
         fflush(stdin);
         gets(str);
         fflush(stdin);
@@ -566,7 +985,7 @@ void alteraramigo(char editor, int amigo)
         break;
 
     case '3':
-        printf("Qual o novo numero de telefone de %s?", Listaamigo[amigo].nome);
+        printf("Qual o novo numero de telefone de %s?: ", Listaamigo[amigo].nome);
         fflush(stdin);
         gets(str);
         fflush(stdin);
@@ -575,7 +994,7 @@ void alteraramigo(char editor, int amigo)
         break;
 
     case '4':
-        printf("Qual o novo email de %s?", Listaamigo[amigo].nome);
+        printf("Qual o novo email de %s?: ", Listaamigo[amigo].nome);
         fflush(stdin);
         gets(str);
         fflush(stdin);
@@ -617,13 +1036,13 @@ void alteraramigo(char editor, int amigo)
 
     printf("Amigo Editado com sucesso!");
     Sleep(1500);
-    menuamigo();
+    return;
 }
 
 void menueditaamigo(int opAmigo)
 {
-    system("cls");
-    printf("Digite 1 para alterar o nome (%s)\n", Listaamigo[opAmigo].nome);
+    CLS
+        printf("Digite 1 para alterar o nome (%s)\n", Listaamigo[opAmigo].nome);
     printf("Digite 2 para alterar o apelido (%s)\n", Listaamigo[opAmigo].apelido);
     printf("Digite 3 para alterar o numero de telefone (%s)\n", Listaamigo[opAmigo].telefone);
     printf("Digite 4 para alterar o email (%s)\n", Listaamigo[opAmigo].email);
@@ -650,36 +1069,25 @@ void excluiamigo(int opAmigo)
     verifica_alocacao(Listaamigo);
     printf("Amigo excluido com sucesso!\n");
     Sleep(2000);
-    menuamigo();
+    return;
 }
 
 void orientaexcluiamigo()
 {
-
-    char opIn;
     int opAmigo;
 
-    system("cls");
-    printf("Digite 1 para pesquisar seu amigo pelo nome\n");
+    CLS
+        printf("Digite 1 para pesquisar seu amigo pelo nome\n");
     printf("Digite 2 para exibir a lista de amigos\n");
-    printf("Digite 3 para voltar\n:");
-
-    while (opIn != '1' && opIn != '2' && opIn != '3')
-    {
-        scanf(" %c", &opIn);
-        if (opIn != '1' && opIn != '2' && opIn != '3')
-        {
-            printf("Operador invalido! Digite novamente: ");
-        }
-    }
+    printf("Digite 3 para voltar\nDigite a opcao: ");
+    char opIn = valida13();
 
     if (opIn == '1')
     {
-        opAmigo = buscaamigonome(false);
+        opAmigo = buscaxnome(1);
         excluiamigo(opAmigo);
     }
-
-    if (opIn == '2')
+    else if (opIn == '2')
     {
 
         printf("Qual o numero do amigo que deseja excluir?: ");
@@ -696,12 +1104,10 @@ void orientaexcluiamigo()
         opAmigo--;
         excluiamigo(opAmigo);
     }
-
-    if(opIn == '3')
+    else
     {
-        menuamigo();
+        return;
     }
-    
 }
 
 void limpamemoria()
@@ -716,6 +1122,17 @@ void limpamemoria()
         free(Listaamigo[i].telefone);
     }
     free(Listaamigo);
+    
+    for (int i = 0; i < Numlocal; i++)
+    {
+        free(Listalocal[i].endereco.estado);
+        free(Listalocal[i].endereco.cidade);
+        free(Listalocal[i].endereco.bairro);
+        free(Listalocal[i].endereco.numero);
+        free(Listalocal[i].endereco.logradouro);
+        free(Listalocal[i].nomelocal);
+    }
+    free(Listaamigo);
 
     for (int i = 0; i < Numcategoria; i++)
     {
@@ -723,26 +1140,12 @@ void limpamemoria()
     }
     free(Listacategoria);
 
-    system("cls");
-    for (int i = 0; word[i] != '\0'; i++)
+    CLS for (int i = 0; word[i] != '\0'; i++)
     {
         printf("%c", word[i]);
         Sleep(80);
     }
     exit(0);
-}
-
-bool validasubmenu(char a)
-{
-
-    if (a != '1' && a != '2' && a != '3' && a != '4')
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
 }
 
 void verifica_alocacao(void *v)
@@ -755,16 +1158,21 @@ void verifica_alocacao(void *v)
     }
 }
 
-bool valido(char a)
+char valida16()
 {
-    if (a != '1' && a != '2' && a != '3' && a != '4' && a != '5' && a != '6')
-    { // char suspender
-        return false;
-    }
-    else
+    char op;
+    do
     {
-        return true;
+        scanf(" %c", &op);
+        if (op != '1' && op != '2' && op != '3' && op != '4' && op != '5' && op != '6')
+        {
+            ERRO(1);
+        }
     }
+    while (op != '1' && op != '2' && op != '3' && op != '4' && op != '5' && op != '6')
+        ;
+
+    return op;
 }
 
 bool validarEmail(char *email)
@@ -836,12 +1244,12 @@ void criaamigo()
     char str[100];
     bool ver = false;
 
-    system("cls");
-    printf("Voce tem %d amigos no momento\n", Numamigo);
+    CLS
+        printf("Voce tem %d amigos no momento\n\n", Numamigo);
 
     if (Numamigo == 0)
     {
-        Listaamigo = (tAmigo *)malloc(sizeof(tAmigo));
+        Listaamigo = (tAmigo *)malloc(1 * sizeof(tAmigo));
         verifica_alocacao(Listaamigo);
     }
     else
@@ -925,7 +1333,8 @@ void criaamigo()
     }
 
     Numamigo++;
-    printf("Amigo adicionado com sucesso!");
+    printf("Amigo adicionado com sucesso!\n");
+    Sleep(2000);
     menuamigo();
 }
 
@@ -971,26 +1380,15 @@ void switchamigo(char op)
 
 void menuamigo()
 {
-    char op;
-    bool ver = false;
 
-    system("cls");
-    printf("***MENU AMIGO***\n\nDigite:\n");
+    CLS
+        printf("***MENU AMIGO***\n\nDigite:\n");
     printf("1 para criar um amigo\n");
     printf("2 para editar um amigo\n");
     printf("3 para excluir um amigo\n");
     printf("4 para voltar\n");
     printf("O que deseja fazer?: ");
-    while (ver == false)
-    {
-        scanf(" %c", &op);
-        ver = validasubmenu(op);
-        if (ver == false)
-        {
-            printf("Operador invalido! Digite novamente: ");
-        }
-    }
-
+    char op = valida14();
     switchamigo(op);
 }
 
@@ -1010,6 +1408,10 @@ void switchprincipal(int op)
         menuamigo();
         break;
 
+    case '2':
+        menulocal();
+        break;
+
     case '3':
         menucategoria();
     }
@@ -1017,8 +1419,7 @@ void switchprincipal(int op)
 
 void menuprincipal()
 {
-
-    system("cls");
+    CLS
     printf("***MENU PRINCIPAL***\n\n");
     printf("Digite:\n");
     printf("1. para manter amigo\n");
@@ -1033,20 +1434,7 @@ void menuprincipal()
 
 void orienta()
 {
-
-    bool ver = false;
-    char op = 0;
-
-    while (ver == false)
-    {
-
-        scanf(" %c", &op);
-        ver = valido(op);
-        if (ver == false)
-        {
-            printf("Operador invalido! Digite novamente: ");
-        }
-    }
+    char op = valida16();
     switchprincipal(op);
 }
 
@@ -1055,8 +1443,7 @@ bool validanome(char nome[])
 
     for (int i = 0; i < Numamigo; i++)
     {
-        int ver = strcmp(nome, Listaamigo[i].nome);
-        if (ver == 0)
+        if (strcmp(nome, Listaamigo[i].nome) == 0)
         {
             return false;
         }
@@ -1064,77 +1451,65 @@ bool validanome(char nome[])
     return true;
 }
 
-int buscaamigonome(bool recurs)
+int buscaxnome(int op)
 {
-    int ver = 1, i;
+    int i;
     char str[100];
 
-    if(!recurs)
+    CLS
+    while (1)
     {
-        system("cls");
-        printf("Qual o nome do seu amigo?(atente-se a letras maiusculas): ");
-    }
-    fflush(stdin);
-    gets(str);
-    fflush(stdin);
-    printf("Buscando");
-    for (int j = 0; j < 3; j++)
-    {
-        printf(".");
-        Sleep(400);
-    }
-    system("cls");
-    for (i = 0; i < Numamigo; i++)
-    {
-        ver = strcmp(Listaamigo[i].nome, str);
-        if (ver == 0)
+        printf("Digite o nome a ser buscado: ");
+        fflush(stdin);
+        gets(str);
+        fflush(stdin);
+        printf("Buscando");
+        for (int j = 0; j < 3; j++)
         {
-            printf("Amigo encontrado!");
-            Sleep(1000);
-            system("cls");
-            return i;
+            printf(".");
+            Sleep(400);
         }
-    }
-
-    ERRO(3);
-    Sleep(1500);
-    return buscaamigonome(true);
-}
-
-int buscacatnome(bool recurs)
-{
-    int ver = 0, i;
-    char str[100];
-
-    if(!recurs)
-    {
-        system("cls");
-        printf("Qual o nome de sua categoria?(atente-se a letras maiusculas): ");
-    }
-    fflush(stdin);
-    gets(str);
-    fflush(stdin);
-    printf("Buscando");
-    for (i = 0; i < 3; i++)
-    {
-        Sleep(400);
-        printf(".");
-    }
-    system("cls");
-    for (i = 0; i < Numcategoria; i++)
-    {
-        ver = strcmp(Listacategoria[i].categoria, str);
-        if (ver == 0)
+        CLS switch (op)
         {
-            printf("Categoria encontrada!");
-            Sleep(1000);
-            system("cls");
-            return i;
+        case 1:
+            for (i = 0; i < Numamigo; i++)
+            {
+                if (strcmp(Listaamigo[i].nome, str) == 0)
+                {
+                    printf("Amigo encontrado!");
+                    Sleep(1000);
+                    CLS return i;
+                }
+            }
+            ERRO(3);
+            Sleep(1500);
+        case 2:
+            for (i = 0; i < Numlocal; i++)
+            {
+                if (strcmp(Listalocal[i].nomelocal, str) == 0)
+                {
+                    printf("Local encontrado!");
+                    Sleep(1000);
+                    CLS return i;
+                }
+            }
+            ERRO(20);
+            Sleep(1500);
+        case 3:
+            for (i = 0; i < Numcategoria; i++)
+            {
+                if (strcmp(Listacategoria[i].categoria, str) == 0)
+                {
+                    printf("Categoria encontrada!");
+                    Sleep(1000);
+                    CLS return i;
+                }
+            }
+            ERRO(9);
+            Sleep(1500);
         }
+        continue;//part of this was coded in the toilet 
     }
-
-    ERRO(3);
-    return buscacatnome(true);
 }
 
 void ERRO(int opErro)
@@ -1166,48 +1541,50 @@ void ERRO(int opErro)
     case 8:
         printf("Categoria invalida! Digite novamente: ");
         break;
-    case 9: 
+    case 9:
         printf("Categotria nao encontrada! Digite novamente: ");
         break;
     case 10:
         printf("Nao existem categorias para serem listadas!");
-    }
-}
-
-void saudacao()
-{
-    time_t t;
-    struct tm *info;
-
-    char bd[] = "Bom dia, querido usuario!", bt[] = "Boa tarde, querido usuario!", bn[] = "Boa noite, querido usuario!";
-
-    time(&t);             // Obtém o tempo atual em formato bruto
-    info = localtime(&t); // Converte para horário local
-
-    int hora = info->tm_hour; // Obtém a hora atual
-
-    if (hora >= 6 && hora < 12)
-    {
-        for (int i = 0; bd[i] != '\0'; i++)
-        {
-            printf("%c", bd[i]);
-            Sleep(60);
-        }
-    }
-    else if (hora >= 12 && hora < 18)
-    {
-        for (int i = 0; bt[i] != '\0'; i++)
-        {
-            printf("%c", bt[i]);
-            Sleep(60);
-        }
-    }
-    else
-    {
-        for (int i = 0; bn[i] != '\0'; i++)
-        {
-            printf("%c", bn[i]);
-            Sleep(60);
-        }
+        break;
+    case 11:
+        printf("Nao existem categorias para serem editadas!");
+        break;
+    case 12:
+        printf("Nao existem categorias para serem excluidas!");
+        break;
+    case 13:
+        printf("Encontro invalido! Digite novamente: ");
+        break;
+    case 14:
+        printf("Encontro nao encontrado! Digite novamente: ");
+        break;
+    case 15:
+        printf("Nao existem encontros para serem listados!");
+        break;
+    case 16:
+        printf("Nao existem encontros para serem editados!");
+        break;
+    case 17:
+        printf("Nao existem encontros para serem excluidos!");
+        break;
+    case 18:
+        printf("Nao existem Locais para serem listados!");
+        break;
+    case 19:
+        printf("Local invalido! Digite novamente: ");
+        break;
+    case 20:
+        printf("Local nao encontrado! Digite novamente: ");
+        break;
+    case 21:
+        printf("Nao existem Locais para serem editados!");
+        break;
+    case 22:
+        printf("Nao existem Locais para serem excluidos!");
+        break;
+    default:
+        printf("___FUDEU MUITO___");
+        limpamemoria();
     }
 }
