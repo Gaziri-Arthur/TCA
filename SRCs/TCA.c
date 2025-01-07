@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <conio.h>
+#define F fflush(stdin);
 #define CLS (_WIN32 ? system("cls") : system("clear"));
 #define SPAUSE                                              \
     printf("Pressione qualquer tecla para continuar. . ."); \
@@ -85,13 +87,13 @@ tCategoria *Listacategoria = NULL;
 int Numencontro = 0, Numamigo = 0, Numcategoria = 0, Numlocal = 0;
 
 //                            // inicio meio e fim
-void start();                 // "fractal trunk"
-void menuprincipal();         // explode o menu principal
-void orienta();               // puxa uma verificacao pos menu principal
-void switchprincipal(int op); // invoca as funoces manter ou relatorios com um SC.
-void limpamemoria();          // limpa memoria alocada
-void end();                   // finalização do programa
+void title();                  // digita o titulo
+void menuprincipal();          // explode o menu principal
+void switchprincipal(char op); // invoca as funoces manter ou relatorios com um SC.
+void limpamemoria();           // limpa memoria alocada
+void end();                    // titulo de saida e fim
 //
+void mainamigo();                          // invoca a main amigo
 void menuamigo();                          // invoca as opcoes de acao para com um amigo
 void switchamigo(char op);                 // switchcase do menu amigo
 void criaamigo();                          // cria amigos
@@ -105,6 +107,7 @@ bool validaemail(char *email);             // validates emails and checks for do
 bool validanumero(char *num);              // checks for doubles
 int buscaxnome(int op);                    // buscapelonome
 //
+void maincat();                // invoca a main categoria
 void menucategoria();          // invoca o menu categoria
 void switchcategoria(char op); // invoca as opcoes de acao para com uma categoria
 void criacategoria();          // cria categorias
@@ -113,12 +116,14 @@ void alteracategoria(int cat); // edita categorias
 void orientaexcluicat();       // orienta a exclusao de categorias
 void excluicat(int opCat);     // exclui categorias
 //
+void mainencontro();          // invoca a main encontro
 void menuencontro();          // invoca o menu encontro
 void switchencontro(char op); // invoca as opcoes de acao para com um encontro
 void incluiencontro();        // inclui encontros
 tEncontro criaencontro();     // cria encontros
 bool validanomenc(char *str); // checks for doubles
 //
+void mainlocal();                        // invoca a main local
 void menulocal();                        // invoca o menu local
 void switchlocal(char op);               // invoca as opcoes de acao para com um local
 void crialocal();                        // cria locais
@@ -145,11 +150,22 @@ char valida15();                                   // valida 1 a 5
 char valida13();                                   // valida 1 a 3
 char valida12();                                   // valida 1 a 2
 void ERRO(int opErro);                             // mensagem de erro
-void adviser(int opex);                            // Pergunta se o usuario quer prossegiuir com a ma ideia
+bool adviser();                                    // Pergunta se o usuario quer prossegiuir com a ma ideia
 
 int main()
 {
-    start();
+    char op;
+    title();
+    do
+    {
+        menuprincipal();
+        op = valida16();
+        switchprincipal(op);
+
+    } while (op != '6');
+
+    limpamemoria();
+    end();
 }
 
 bool validanomenc(char *str)
@@ -177,9 +193,25 @@ void switchencontro(char op)
     case '3':
         // excluiencontro();
         break;
-    default:
-        break;
     }
+    return;
+}
+
+void mainencontro()
+{
+    char op;
+    do
+    {
+        menuencontro();
+        op = valida14();
+        if (op == '4')
+        {
+            break;
+        }
+        switchencontro(op);
+
+    } while (op != '4');
+    return;
 }
 
 void menuencontro()
@@ -192,8 +224,6 @@ void menuencontro()
     printf("3. para excluir um encontro\n");
     printf("4. para voltar\n");
     printf("\nO que deseja fazer?: ");
-    char op = valida14();
-    switchencontro(op);
 }
 
 void incluiencontro()
@@ -295,7 +325,6 @@ tEncontro criaencontro()
         Sleep(3000);
         criaamigo();
         encontro.amigos[0] = &Listaamigo[Numamigo - 1];
-        Sleep(4000);
         encontro.Namigos = 1;
         printf("O amigo criado foi adicionado com sucesso!\n");
 
@@ -316,6 +345,10 @@ tEncontro criaencontro()
                 CLS
                     printf("O amigo criado foi adicionado com sucesso!\n");
                 Sleep(2000);
+            }
+            else
+            {
+                break;
             }
 
         } while (op);
@@ -340,6 +373,7 @@ tEncontro criaencontro()
                 }
             }
             encontro.amigos[0] = &Listaamigo[opl - 1];
+            encontro.Namigos = 1;
             Sleep(4000);
         }
         else
@@ -353,39 +387,25 @@ tEncontro criaencontro()
             printf("O amigo criado foi adicionado com sucesso!\n");
         }
     }
+    CLS
+        printf("Deseja adicionar mais amigos?(S/N): ");
+    char op = validasimnao();
+
     printf("Funcao finalizada");
     Sleep(3000);
     return encontro;
 }
 
-void adviser(int opex)
+bool adviser()
 {
     CLS
         ERRO(0);
     bool maideia = validasimnao();
     if (maideia)
     {
-        if (opex == 1)
-        {
-            orientaexcluiamigo();
-        }
-        else if (opex == 2)
-        {
-            orientaexcluilocal();
-        }
-        else if (opex == 3)
-        {
-            orientaexcluicat();
-        }
-        else
-        {
-            // orientaexcluiencontro();
-        }
+        return true;
     }
-    else
-    {
-        menuprincipal();
-    }
+    return false;
 }
 
 void excluilocal(int opLocal)
@@ -561,6 +581,7 @@ char valida14()
     char opIn;
     do
     {
+        F
         scanf(" %c", &opIn);
         if (opIn != '1' && opIn != '2' && opIn != '3' && opIn != '4')
         {
@@ -751,17 +772,34 @@ void switchlocal(char op)
         }
         else if (Numlocal < 2)
         {
-            adviser(2);
+            if (adviser())
+            {
+                orientaexcluilocal();
+            }
         }
         else
         {
             orientaexcluilocal();
         }
-
         break;
-    case '4':
-        return;
     }
+    return;
+}
+
+void mainlocal()
+{
+    char op;
+    do
+    {
+        menulocal();
+        op = valida14();
+        if (op == '4')
+        {
+            break;
+        }
+        switchlocal(op);
+
+    } while (op != '4');
     return;
 }
 
@@ -775,8 +813,6 @@ void menulocal()
     printf("3. para excluir um local\n");
     printf("4. para voltar\n");
     printf("\nO que deseja fazer?: ");
-    char op = valida14();
-    switchlocal(op);
     return;
 }
 
@@ -951,7 +987,23 @@ void criacategoria()
     Numcategoria++;
     printf("Categoria adicionada com sucesso!\n");
     Sleep(2000);
-    menucategoria();
+    return;
+}
+
+void maincat()
+{
+    char op;
+    while (op != '4')
+    {
+        menucategoria();
+        op = valida14();
+        if(op == '4')
+        {
+            break;
+        }
+        switchcategoria(op);
+    } 
+    return;
 }
 
 void menucategoria()
@@ -964,8 +1016,6 @@ void menucategoria()
     printf("3. para excluir uma categoria\n");
     printf("4. para voltar\n");
     printf("\nO que deseja fazer?: ");
-    char op = valida14();
-    switchcategoria(op);
     return;
 }
 
@@ -998,21 +1048,21 @@ void switchcategoria(char op)
         }
         else if (Numcategoria < 2)
         {
-            adviser(3);
+            if (adviser())
+            {
+                orientaexcluicat();
+            }
         }
         else
         {
             orientaexcluicat();
             break;
         }
-
-    case '4':
-        menuprincipal();
     }
     return;
 }
 
-void start()
+void title()
 {
 
     char word[] = "Hello, world!";
@@ -1023,7 +1073,6 @@ void start()
         Sleep(100);
     }
     Sleep(900);
-    menuprincipal();
 }
 
 void switchrelatorios(char op)
@@ -1510,7 +1559,7 @@ void criaamigo()
     Numamigo++;
     CLS
         printf("Amigo adicionado com sucesso!\n");
-    Sleep(2000);
+    Sleep(1500);
     return;
 }
 
@@ -1543,7 +1592,10 @@ void switchamigo(char op)
         }
         else if (Numamigo < 2)
         {
-            adviser(1);
+            if (adviser())
+            {
+                orientaexcluiamigo();
+            }
         }
         else
         {
@@ -1551,9 +1603,25 @@ void switchamigo(char op)
         }
         break;
     case '4':
-        menuprincipal();
         break;
     }
+    return;
+}
+
+void mainamigo()
+{
+    char op;
+    while (op != '4')
+    {
+        menuamigo();
+        op = valida14();
+        if (op == '4')
+        {
+            break;
+        }
+        switchamigo(op);
+    } 
+    return;
 }
 
 void menuamigo()
@@ -1566,11 +1634,9 @@ void menuamigo()
     printf("3. para excluir um amigo\n");
     printf("4. para voltar\n");
     printf("\nO que deseja fazer?: ");
-    char op = valida14();
-    switchamigo(op);
 }
 
-void switchprincipal(int op)
+void switchprincipal(char op)
 {
 
     switch (op)
@@ -1583,22 +1649,22 @@ void switchprincipal(int op)
         break;
 
     case '1':
-        menuamigo();
+        mainamigo();
         break;
 
     case '2':
-        menulocal();
+        mainlocal();
         break;
 
     case '3':
-        menucategoria();
+        maincat();
         break;
 
     case '4':
-        menuencontro();
+        mainencontro();
         break;
     }
-    menuprincipal();
+    return;
 }
 
 void menuprincipal()
@@ -1613,13 +1679,6 @@ void menuprincipal()
     printf("5. para Relatorios\n");
     printf("6. para Sair\n");
     printf("\nO que deseja fazer?: ");
-    orienta();
-}
-
-void orienta()
-{
-    char op = valida16();
-    switchprincipal(op);
 }
 
 bool validanome(char *nome)
@@ -1765,7 +1824,7 @@ void ERRO(int opErro)
         printf("Data invalida! Digite novamente: ");
         break;
     case 0:
-        printf("Realocar um vetor dinâmico para 0 posições não é uma boa ideia.\nTem certeza de que deseja prosseguir?(S/N): ");
+        printf("Realocar um vetor dinamico para 0 posicoes nao e uma boa ideia.\nTem certeza de que deseja prosseguir?(S/N): ");
         break;
     case 1:
         printf("Operador invalido! Digite novamente: ");
