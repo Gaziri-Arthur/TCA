@@ -247,6 +247,11 @@ void incluiencontro()
     return;
 }
 
+void showavfr(tAmigo *vet[])
+{
+
+}
+
 tEncontro criaencontro()
 {
     char str[100];
@@ -390,6 +395,10 @@ tEncontro criaencontro()
     CLS
         printf("Deseja adicionar mais amigos?(S/N): ");
     char op = validasimnao();
+if(op)
+{
+
+}
 
     printf("Funcao finalizada");
     Sleep(3000);
