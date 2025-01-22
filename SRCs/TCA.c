@@ -247,14 +247,22 @@ void exibeencontro(bool rel, bool prolongar, bool detalhar)
         {
             printf("Encontro [%d]: %s\n", i + 1, Listaencontro[i].nome);
             printf("Descrito como: \"%s\"\n", Listaencontro[i].descricao);
-            printf("Local:\n\n");
-            printf("%s, %s, %s, %s, %s, %s\n\n", Listaencontro[i].local->endereco.logradouro, Listaencontro[i].local->endereco.cidade, Listaencontro[i].local->endereco.bairro, Listaencontro[i].local->endereco.cidade, Listaencontro[i].local->endereco.estado);
+            printf("%d Amigos\n", Listaencontro[i].Namigos);
+
+            printf("Local:\n");
+            printf("%s, %s, %s, %s, %s\n\n", Listaencontro[i].local->endereco.logradouro, Listaencontro[i].local->endereco.numero, Listaencontro[i].local->endereco.bairro, Listaencontro[i].local->endereco.cidade, Listaencontro[i].local->endereco.estado);
             printf("Amigos:\n\n");
             printf("##############################\n");
             for (int j = 0; j < Listaencontro[i].Namigos; j++)
             {
+                if (Listaencontro[i].amigos[j] == NULL)
+                {
+                    printf("Erro: amigos[%d] é NULL!\n", j);
+                    exit(1); // Ou trate o erro de forma adequada
+                }
+            
                 printf("[%d] %s, (%s)\n", j + 1, Listaencontro[i].amigos[j]->nome, Listaencontro[i].amigos[j]->apelido);
-                printf("Dados: (%d/%d/%d), %s, %s", Listaencontro[i].amigos[j]->nascimento.dia, Listaencontro[i].amigos[j]->nascimento.mes, Listaencontro[i].amigos[j]->nascimento.ano, Listaencontro[i].amigos[j]->telefone, Listaencontro[i].amigos[j]->email);
+                printf("Dados: (%d/%d/%d), %s, %s\n", Listaencontro[i].amigos[j]->nascimento.dia, Listaencontro[i].amigos[j]->nascimento.mes, Listaencontro[i].amigos[j]->nascimento.ano, Listaencontro[i].amigos[j]->telefone, Listaencontro[i].amigos[j]->email);
                 printf("##############################\n");
             }
             printf("\n");
@@ -409,8 +417,6 @@ tEncontro criaencontro()
         CLS
             encontro
                 .local = &Listalocal[Numlocal - 1];
-                printf("%s", encontro.local->endereco.cidade);
-                Sleep(4000);
         printf("O local criado foi adicionado com sucesso!\n");
     }
     else
@@ -433,8 +439,6 @@ tEncontro criaencontro()
                 }
             }
             encontro.local = &Listalocal[opl - 1];
-
-            Sleep(4000);
         }
         else
         {
@@ -456,31 +460,7 @@ tEncontro criaencontro()
         encontro.amigos[0] = &Listaamigo[Numamigo - 1];
         encontro.Namigos = 1;
         printf("O amigo criado foi adicionado com sucesso!\n");
-
-        bool op;
-        do
-        {
-            CLS
-                printf("Seu encontro tem [%d] amigo.\n", encontro.Namigos);
-            printf("Deseja criar um novo amigo para o seu encontro?(S/N): ");
-            op = validasimnao();
-            if (op)
-            {
-                incluiamigo();
-                encontro.amigos = (tAmigo **)realloc(encontro.amigos, (encontro.Namigos + 1) * sizeof(tAmigo *));
-                verifica_alocacao(encontro.amigos);
-                encontro.amigos[Numamigo - 1] = &Listaamigo[Numamigo - 1];
-                encontro.Namigos++;
-                CLS
-                    printf("O amigo criado foi adicionado com sucesso!\n");
-                Sleep(2000);
-            }
-            else
-            {
-                break;
-            }
-
-        } while (op);
+        Sleep(1000);
     }
     else
     {
@@ -503,7 +483,6 @@ tEncontro criaencontro()
             }
             encontro.amigos[0] = &Listaamigo[opl - 1];
             encontro.Namigos = 1;
-            Sleep(4000);
         }
         else
         {
@@ -532,7 +511,9 @@ tEncontro criaencontro()
                 incluiamigo();
                 encontro.amigos = (tAmigo **)realloc(encontro.amigos, (encontro.Namigos + 1) * sizeof(tAmigo *));
                 verifica_alocacao(encontro.amigos);
-                encontro.amigos[Numamigo - 1] = &Listaamigo[Numamigo - 1];
+                encontro.amigos[encontro.Namigos] = &Listaamigo[Numamigo - 1];
+                printf("%s", encontro.amigos[encontro.Namigos]->nome);
+                Sleep(2000);
                 encontro.Namigos++;
                 CLS
                     printf("O amigo criado foi adicionado com sucesso!\n");
@@ -546,7 +527,7 @@ tEncontro criaencontro()
                 CLS
                     tAmigo aux = showchavfr(encontro.amigos, encontro.Namigos);
                 encontro.amigos[encontro.Namigos] = &aux;
-                puts(encontro.amigos[encontro.Namigos]->nome);
+                printf("%s", encontro.amigos[encontro.Namigos]->nome);
                 Sleep(3000);
                 encontro.Namigos++;
             }
@@ -620,7 +601,6 @@ tEncontro criaencontro()
             ERRO(-2);
         }
     } while (!validarhorario(encontro.horario.hora, encontro.horario.minuto));
-    Sleep(3000);
     return encontro;
 }
 
@@ -1219,7 +1199,7 @@ void incluicategoria()
     Numcategoria++;
 
     CLS
-        printf("categotia criada com sucesso!\n");
+        printf("Categoria criada com sucesso!\n");
     Sleep(2000);
     return;
 }
@@ -1235,9 +1215,6 @@ tCategoria criacategoria()
             .categoria = (char *)malloc((strlen(str) + 1) * sizeof(char));
     verifica_alocacao(categoria.categoria);
     strcpy(categoria.categoria, str);
-
-    Numcategoria++;
-    printf("Categoria adicionada com sucesso!\n");
     Sleep(2000);
     return categoria;
 }
@@ -1686,7 +1663,7 @@ void limpacategoria()
 }
 void limpaencontro()
 {
-    for(int i = 0; i < Numencontro; i++)
+    for (int i = 0; i < Numencontro; i++)
     {
         free(Listaencontro[i].nome);
         free(Listaencontro[i].descricao);
@@ -1713,8 +1690,8 @@ void limpamemoria()
     {
         limpacategoria();
     }
-    
-    if(Numencontro != 0)
+
+    if (Numencontro != 0)
     {
         limpaencontro();
     }
@@ -1808,7 +1785,7 @@ void incluiamigo()
     Numamigo++;
 
     CLS
-        printf("Amigo criado com sucesso!");
+        printf("Amigo criado com sucesso!\n");
     Sleep(2000);
     return;
 }
@@ -1879,8 +1856,7 @@ tAmigo criaamigo()
         }
     } while (!(validanascimento(amigo.nascimento.dia, amigo.nascimento.mes, amigo.nascimento.ano)));
 
-    CLS
-    return amigo;
+    CLS return amigo;
 }
 
 void switchamigo(char op)
