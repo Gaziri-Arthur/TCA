@@ -122,7 +122,7 @@ void menuencontro();                     // invoca o menu encontro
 void switchencontro(char op);            // invoca as opcoes de acao para com um encontro
 void incluiencontro();                   // inclui encontros
 tEncontro criaencontro();                // cria encontros
-tAmigo showchavfr(tAmigo *vet[], int t); // exibe os amigos disponiveis para a incusao
+tAmigo showchavfr(tAmigo *vet[], int t); // exibe os amigos disponiveis para a incusao num encontro
 bool validanomenc(char *str);            // checks for doubles
 //
 void mainlocal();                        // invoca a main local
@@ -247,23 +247,22 @@ void exibeencontro(bool rel, bool prolongar, bool detalhar)
         {
             printf("Encontro [%d]: %s\n", i + 1, Listaencontro[i].nome);
             printf("Descrito como: \"%s\"\n", Listaencontro[i].descricao);
-            printf("%d Amigos\n", Listaencontro[i].Namigos);
 
             printf("Local:\n");
             printf("%s, %s, %s, %s, %s\n\n", Listaencontro[i].local->endereco.logradouro, Listaencontro[i].local->endereco.numero, Listaencontro[i].local->endereco.bairro, Listaencontro[i].local->endereco.cidade, Listaencontro[i].local->endereco.estado);
-            printf("Amigos:\n\n");
-            printf("##############################\n");
+            printf("Amigos(%d):\n\n", Listaencontro[i].Namigos);
+            printf("===============================\n");
             for (int j = 0; j < Listaencontro[i].Namigos; j++)
             {
                 if (Listaencontro[i].amigos[j] == NULL)
                 {
                     printf("Erro: amigos[%d] é NULL!\n", j);
-                    exit(1); // Ou trate o erro de forma adequada
+                    exit(1);
                 }
             
                 printf("[%d] %s, (%s)\n", j + 1, Listaencontro[i].amigos[j]->nome, Listaencontro[i].amigos[j]->apelido);
-                printf("Dados: (%d/%d/%d), %s, %s\n", Listaencontro[i].amigos[j]->nascimento.dia, Listaencontro[i].amigos[j]->nascimento.mes, Listaencontro[i].amigos[j]->nascimento.ano, Listaencontro[i].amigos[j]->telefone, Listaencontro[i].amigos[j]->email);
-                printf("##############################\n");
+                printf("Dados:\nNascimento: (%d/%d/%d), Telefone: %s, E-mail: %s\n", Listaencontro[i].amigos[j]->nascimento.dia, Listaencontro[i].amigos[j]->nascimento.mes, Listaencontro[i].amigos[j]->nascimento.ano, Listaencontro[i].amigos[j]->telefone, Listaencontro[i].amigos[j]->email);
+                printf("===============================\n");
             }
             printf("\n");
             printf("Categoria: %s\n", Listaencontro[i].categoria->categoria);
@@ -512,7 +511,6 @@ tEncontro criaencontro()
                 encontro.amigos = (tAmigo **)realloc(encontro.amigos, (encontro.Namigos + 1) * sizeof(tAmigo *));
                 verifica_alocacao(encontro.amigos);
                 encontro.amigos[encontro.Namigos] = &Listaamigo[Numamigo - 1];
-                printf("%s", encontro.amigos[encontro.Namigos]->nome);
                 Sleep(2000);
                 encontro.Namigos++;
                 CLS
@@ -527,8 +525,6 @@ tEncontro criaencontro()
                 CLS
                     tAmigo aux = showchavfr(encontro.amigos, encontro.Namigos);
                 encontro.amigos[encontro.Namigos] = &aux;
-                printf("%s", encontro.amigos[encontro.Namigos]->nome);
-                Sleep(3000);
                 encontro.Namigos++;
             }
         }
@@ -577,11 +573,13 @@ tEncontro criaencontro()
             printf("A categoria criada foi adicionada com sucesso!\n");
         }
     }
+    CLS
     printf("Descreva o que acontecera em seu encontro: ");
     GTS
         encontro.descricao = (char *)malloc((strlen(str) + 1) * sizeof(char));
     verifica_alocacao(encontro.descricao);
     strcpy(encontro.descricao, str);
+    CLS
     printf("Que dia sera seu encontro?: ");
     do
     {
@@ -1200,7 +1198,7 @@ void incluicategoria()
 
     CLS
         printf("Categoria criada com sucesso!\n");
-    Sleep(2000);
+    Sleep(1000);
     return;
 }
 
@@ -1215,7 +1213,6 @@ tCategoria criacategoria()
             .categoria = (char *)malloc((strlen(str) + 1) * sizeof(char));
     verifica_alocacao(categoria.categoria);
     strcpy(categoria.categoria, str);
-    Sleep(2000);
     return categoria;
 }
 
@@ -1333,6 +1330,7 @@ void switchrelatorios(char op)
         {
             exibecategoria(true);
         }
+        break;
     case '2':
         if (Numlocal < 1)
         {
@@ -1344,6 +1342,8 @@ void switchrelatorios(char op)
         {
             exibelocal(true, true);
         }
+        break;
+
     case '4':
         if (Numencontro < 1)
         {
@@ -1355,6 +1355,7 @@ void switchrelatorios(char op)
         {
             exibeencontro(true, true, true);
         }
+        break;
     }
 
     return;
