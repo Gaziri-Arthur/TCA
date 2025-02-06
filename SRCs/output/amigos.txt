@@ -28,8 +28,23 @@ Art
 4;10;2008;
 gaziriarthur@gmail.com
 43 996714995
-Erick
-Gray
-5;11;2008;
-soubomnobrawl@gmail.com
-41 678987656
+Pedro Henrique
+pepo
+12;12;2024;
+@.
+41912345678
+Miguel
+Meu fi
+11;12;2008;
+naotenho@gmail.com
+41 00000000
+Nycollas
+Grelo
+12;2;2009;
+einstenho@gmail.com
+41 678987654
+Nathan IF
+Jimmy
+12;3;2009;
+neutron@gmail.com
+41 67898765
