@@ -91,61 +91,67 @@ tCategoria *Listacategoria = NULL;
 
 int Numencontro = 0, Numamigo = 0, Numcategoria = 0, Numlocal = 0;
 
-void title(); // digita o titulo
-void end();   // digita o final
+/* I N I C I O   E   F I M */
+void title();                                                // digita o titulo
+void end();                                                  // digita o final
 
-void menuprincipal();  // explode o menu principal
-void menuamigo();      // invoca as opcoes de acao para com um amigo
-void menulocal();      // invoca o menu local
-void menucategoria();  // invoca o menu categoria
-void menuencontro();   // invoca o menu encontro
-void menurelatorios(); // puxa as opcoes de relatorios
+/* M E N U S */
+void menuprincipal();                                        // explode o menu principal
+void menuamigo();                                            // invoca as opcoes de acao para com um amigo
+void menulocal();                                            // invoca o menu local
+void menucategoria();                                        // invoca o menu categoria
+void menuencontro();                                         // invoca o menu encontro
+void menurelatorios();                                       // puxa as opcoes de relatorios
 
-void mainamigo();      // invoca a main amigo
-void maincat();        // invoca a main categoria
-void mainlocal();      // invoca a main local
-void mainencontro();   // invoca a main encontro
-void mainrelatorios(); // invoca a main relatorios
+/* M A I N S */
+void mainamigo();                                            // invoca a main amigo
+void maincat();                                              // invoca a main categoria
+void mainlocal();                                            // invoca a main local
+void mainencontro();                                         // invoca a main encontro
+void mainrelatorios();                                       // invoca a main relatorios
 
-void switchprincipal(char op);  // invoca as funoces manter ou relatorios com um SC.
-void switchamigo(char op);      // switchcase do menu amigo
-void switchlocal(char op);      // invoca as opcoes de acao para com um local
-void switchcategoria(char op);  // invoca as opcoes de acao para com uma categoria
-void switchencontro(char op);   // invoca as opcoes de acao para com um encontro
-void switchrelatorios(char op); // invoca as funcoes de relatorio
+/* S W I T C H S */
+void switchprincipal(char op);                               // invoca as funoces manter ou relatorios com um SC.
+void switchamigo(char op);                                   // switchcase do menu amigo
+void switchlocal(char op);                                   // invoca as opcoes de acao para com um local
+void switchcategoria(char op);                               // invoca as opcoes de acao para com uma categoria
+void switchencontro(char op);                                // invoca as opcoes de acao para com um encontro
+void switchrelatorios(char op);                              // invoca as funcoes de relatorio
 
-void incluiamigo();     // inclui amigos
-void incluilocal();     // inclui locais
-void incluicategoria(); // inclui categorias
-void incluiencontro();  // inclui encontros
+/* I N C L U S O E S */
+void incluiamigo();                                          // inclui amigos
+void incluilocal();                                          // inclui locais
+void incluicategoria();                                      // inclui categorias
+void incluiencontro();                                       // inclui encontros
+tAmigo criaamigo();                                          // cria amigos
+tLocal crialocal();                                          // cria locais
+tCategoria criacategoria();                                  // cria categorias
+tEncontro criaencontro();                                    // cria encontros
 
-tAmigo criaamigo();         // cria amigos
-tLocal crialocal();         // cria locais
-tCategoria criacategoria(); // cria categorias
-tEncontro criaencontro();   // cria encontros
+/* O R I E N T A S   E X C L U I   E   E D I T A */
+void orientaeditaamigo();                                    // edita dados dos amigos
+void orientaexcluiamigo();                                   // orienta a exlusao de amigos
+void orientaeditalocal();                                    // orienta a edicao de locais
+void orientaexcluilocal();                                   // orienta a exclusao de locais
+void orientaeditacategoria();                                // orienta a edicao de categoria
+void orientaexcluicat();                                     // orienta a exclusao de categorias
+void orientaeditaencontro();                                 // orienta a edicao de encontros
+void orientaexcluiencontro();                                // orienta a exclusao de encontros
+void menueditaamigo(int opAmigo);                            // "o que deseja fazer com este amigo?"
+void menueditalocal(int opLocal);                            // "o que deseja fazer com este local?"
+void menueditaencontro(int opEncontro);                      // "o que deseja fazer com este encontro?"
 
-void orientaeditaamigo();     // edita dados dos amigos
-void orientaexcluiamigo();    // orienta a exlusao de amigos
-void orientaeditalocal();     // orienta a edicao de locais
-void orientaexcluilocal();    // orienta a exclusao de locais
-void orientaeditacategoria(); // orienta a edicao de categoria
-void orientaexcluicat();      // orienta a exclusao de categorias
-void orientaeditaencontro();  // orienta a edicao de encontros
-void orientaexcluiencontro(); // orienta a exclusao de encontros
+/* E D I T A S   E   E X C L U I S */
+void editaamigo(char editor, int amigo);                     // factualmente muda os dados do amigo
+void excluiamigo(int opAmigo);                               // lista negra
+void editalocal(char editor, int local);                     // edita locais
+void excluilocal(int opLocal);                               // exclui locais
+void editacategoria(int cat);                                // edita categorias
+void excluicat(int opCat);                                   // exclui categorias
+void editaencontro(int editor, int encontro);                // edita encontros
+void excluiencontro(int opEncontro);                         // exclui encontros
 
-void menueditaamigo(int opAmigo);       // "o que deseja fazer com este amigo?"
-void menueditalocal(int opLocal);       // "o que deseja fazer com este local?"
-void menueditaencontro(int opEncontro); // "o que deseja fazer com este encontro?"
-
-void editaamigo(char editor, int amigo);      // factualmente muda os dados do amigo
-void excluiamigo(int opAmigo);                // lista negra
-void editalocal(char editor, int local);      // edita locais
-void excluilocal(int opLocal);                // exclui locais
-void editacategoria(int cat);                 // edita categorias
-void excluicat(int opCat);                    // exclui categorias
-void editaencontro(int editor, int encontro); // edita encontros
-void excluiencontro(int opEncontro);          // exclui encontros
-
+/* R E L A T O R I O S */
 void exibeamigo(bool prolongar, bool rel);                   // printa os amigos e suas informacoes
 void exibeumamigo(int a);                                    // printa um amigo
 void exibelocal(bool prolongar, bool rel);                   // printa os locais e suas informacoes
@@ -156,53 +162,57 @@ void exibeencontro(bool rel, bool prolongar, bool detalhar); // printa os encont
 void exibeumencontro(int e);                                 // printa uma encontro
 void exibeamigoencontro(tEncontro encontro);                 // printa os amigos de um encontro
 
-bool validanome(char *nome);                       // cheks if theres a friend w that name
-bool validaemail(char *email);                     // validates emails and checks for doubles
-bool validanumero(char *num);                      // checks for doubles
-bool validaapelido(char *apelido);                 // checks for doubles
-bool validanascimento(int dias, int mes, int ano); // valida datas de nascimento
-bool validadataenc(int dias, int mes, int ano);    // valida datas para encontros
-bool validarhorario(int hora, int min);            // valida horarios
-bool validanomenc(char *str);                      // checks for doubles
-bool validanomelocal(char *nome);                  // checks for doubles
-bool validacat(char *str);                         // checks for doubles
+/* V A L I D A C O E S   D E   D A D O S */
+bool validanome(char *nome);                                 // cheks if theres a friend w that name
+bool validaemail(char *email);                               // validates emails and checks for doubles
+bool validanumero(char *num);                                // checks for doubles
+bool validaapelido(char *apelido);                           // checks for doubles
+bool validanascimento(int dias, int mes, int ano);           // valida datas de nascimento
+bool validadataenc(int dias, int mes, int ano);              // valida datas para encontros
+bool validarhorario(int hora, int min);                      // valida horarios
+bool validanomenc(char *str);                                // checks for doubles
+bool validanomelocal(char *nome);                            // checks for doubles
+bool validacat(char *str);                                   // checks for doubles
 
-int showchavfr(tAmigo *vet[], int t); // exibe os amigos disponiveis para a incusao num encontro
-int showchavcat(tEncontro encontro);  // exibe as categorias disponiveis
-int showchavpl(tEncontro encontro);   // exibe os locais disponiveis
+/* E X I B I C A O   D E   D A D O S   D I S P O N I V E I S */
+int showchavfr(tAmigo *vet[], int t);                        // exibe os amigos disponiveis para a incusao num encontro
+int showchavcat(tEncontro encontro);                         // exibe as categorias disponiveis
+int showchavpl(tEncontro encontro);                          // exibe os locais disponiveis
 
-char valida12();                                  // valida 1 a 2
-char valida14();                                  // valida operadoeres 1 a 4
-char valida16();                                  // valida operador do menu principal
-bool validasimnao();                              // valida sim e nao
-bool isstringint(char *str);                      // checks if a string is an int
-bool adviser();                                   // Pergunta se o usuario quer prossegiuir com a ma ideia
-void verifica_alocacao(void *v);                  // verifica se alocacao dinamica deu certo
-void ERRO(int opErro);                            // mensagem de erro
-void sucesso(int opSucesso);                      // mensagem de sucesso
-int buscaxnome(int op, char *str);                // buscapelonome
-int opvalido(int delimitador);                    // valida todos os operadores
-int buscadadovalido(int indice, int delimitador); // busca por indices de qualquer dado
+/* M I S C E L L A N E O U S */
+char valida12();                                             // valida 1 a 2
+char valida14();                                             // valida operadoeres 1 a 4
+char valida16();                                             // valida operador do menu principal
+bool validasimnao();                                         // valida sim e nao
+bool isstringint(char *str);                                 // checks if a string is an int
+bool adviser();                                              // Pergunta se o usuario quer prossegiuir com a ma ideia
+void verifica_alocacao(void *v);                             // verifica se alocacao dinamica deu certo
+void ERRO(int opErro);                                       // mensagem de erro
+void sucesso(int opSucesso);                                 // mensagem de sucesso
+int buscaxnome(int op, char *str);                           // buscapelonome
+int opvalido(int delimitador);                               // valida todos os operadores
+int buscadadovalido(int indice, int delimitador);            // busca por indices de qualquer dado
 
-void rereferenciaamigo();     // prefiro nao comentar
-void rereferenciacategoria(); // prefiro nao comentar
-void rereferencialocal();     // prefiro nao comentar
-void rereferencia();          // prefiro nao comentar
-void limpamemoria();          // limpa memoria alocada
-void limpaamigo();            // dos amigos
-void limpalocal();            // dos locais
-void limpacategoria();        // das categorias
-void limpaencontro();         // dos encontros
-void enviadados();            // envia dados para o arquivo
-void enviaamigos();           // envia amigos para o arquivo
-void enviacategoria();        // envia categorias para o arquivo
-void envialocal();            // envia locais para o arquivo
-void enviaencontro();         // envia encontros para o arquivo
-void recolhedados();          // recolhe dados do arquivo
-void recolheamigo();          // recolhe amigos do arquivo
-void recolhecategoria();      // recolhe categorias do arquivo
-void recolhelocal();          // recolhe locais do arquivo
-void recolheencontro();       // recolhe encontros do arquivo
+/* M A N I P U L A C O E S   D E   M E M O R I A */
+void rereferenciaamigo();                                    // prefiro nao comentar
+void rereferenciacategoria();                                // prefiro nao comentar
+void rereferencialocal();                                    // prefiro nao comentar
+void rereferencia();                                         // prefiro nao comentar
+void limpamemoria();                                         // limpa memoria alocada
+void limpaamigo();                                           // dos amigos
+void limpalocal();                                           // dos locais
+void limpacategoria();                                       // das categorias
+void limpaencontro();                                        // dos encontros
+void enviadados();                                           // envia dados para o arquivo
+void enviaamigos();                                          // envia amigos para o arquivo
+void enviacategoria();                                       // envia categorias para o arquivo
+void envialocal();                                           // envia locais para o arquivo
+void enviaencontro();                                        // envia encontros para o arquivo
+void recolhedados();                                         // recolhe dados do arquivo
+void recolheamigo();                                         // recolhe amigos do arquivo
+void recolhecategoria();                                     // recolhe categorias do arquivo
+void recolhelocal();                                         // recolhe locais do arquivo
+void recolheencontro();                                      // recolhe encontros do arquivo
 
 int main()
 {
@@ -442,6 +452,7 @@ void exibeamigoencontro(tEncontro encontro)
 
 void removeamigoencontro(int i, int encontro)
 {
+    CLS
     if (i < Listaencontro[encontro].Namigos)
     {
         for (int j = i; j < Listaencontro[encontro].Namigos - 1; j++)
@@ -458,6 +469,7 @@ void removeamigoencontro(int i, int encontro)
     verifica_alocacao(Listaencontro[encontro].idamigos);
     Listaencontro[encontro].Namigos--;
     printf("Amigo removido com sucesso do encontro!\n");
+    Sleep(1000);
     return;
 }
 
@@ -514,26 +526,8 @@ void editaamigosencontro(int op, int encontro)
         break;
     case 2:
         exibeamigoencontro(Listaencontro[encontro]);
-        printf("\n\nQual amigo deseja excluir?(nome/indice): ");
-        do
-        {
-            GTS if (!isstringint(str))
-            {
-                i = buscaxnome(1, str);
-                break;
-            }
-            else
-            {
-                i = atoi(str);
-                if (i < 1 || i > Listaencontro[encontro].Namigos)
-                {
-                    ERRO(1);
-                    continue;
-                }
-                i--;
-                break;
-            }
-        } while (1);
+        printf("\n\nQual amigo deseja excluir?(indice): ");
+        (i = opvalido(Listaencontro[encontro].Namigos) - 1);
         removeamigoencontro(i, encontro);
         break;
     case 3:
@@ -1386,6 +1380,7 @@ void menuencontro()
     printf("[4] para voltar\n");
     printf("---------------------------\n");
     printf("\n\n--O que deseja fazer?: ");
+    return;
 }
 
 void incluiencontro()
@@ -2411,10 +2406,13 @@ void title()
     int tam = strlen(word);
     for (int i = 0; i < tam; i++)
     {
-        printf("\b \b"); 
+        printf("\b \b");
         Sleep(70);
     }
-    Sleep(700);
+    Sleep(1000);
+    printf("--- Agenda ultraespecifica ---");
+    Sleep(1000);
+    return;
 }
 
 void exibeumamigo(int a)
@@ -2593,20 +2591,7 @@ void switchrelatorios(char op)
         {
             exibecategoria(false);
             printf("\n\nPor qual das categorias deseja fazer o relatorio?(nome/indice): ");
-            char str[100];
-            do
-            {
-                GTS if (!isstringint(str))
-                {
-                    relpercat(buscaxnome(3, str));
-                    break;
-                }
-                else
-                {
-                    relpercat(atoi(str) - 1);
-                    break;
-                }
-            } while (1);
+            relpercat(buscadadovalido(3, Numcategoria));
         }
         break;
     }
@@ -3072,7 +3057,7 @@ bool validaapelido(char *apelido)
 {
     for (int i = 0; i < Numamigo; i++)
     {
-        if (strcmp(apelido, Listaamigo[i].apelido) == 0)
+        if (strcmp(apelido, Listaamigo[i].apelido) == 0 || strcmp(apelido, Listaamigo[i].nome) == 0)
         {
             return false;
         }
@@ -3107,6 +3092,11 @@ tAmigo criaamigo()
         GTS if (!validaapelido(str))
         {
             printf("\nJa existe um amigo com este apelido.\nDigite novamente: ");
+            continue;
+        }
+        if(strcmp(str, amigo.nome) == 0)
+        {
+            printf("\nSeu amigo nao pode ter o mesmo apelido que seu nome.\nDigite novamente: ");
         }
         else
         {
@@ -3241,6 +3231,7 @@ void menuamigo()
     printf("[4] para voltar\n");
     printf("-------------------------\n");
     printf("\n\n--O que deseja fazer?: ");
+    return;
 }
 
 void switchprincipal(char op)
@@ -3286,6 +3277,7 @@ void menuprincipal()
     printf("[6] para Sair\n");
     printf("-------------------------------\n");
     printf("\n\n--O que deseja fazer?: ");
+    return;
 }
 
 bool validanome(char *nome)
@@ -3293,7 +3285,7 @@ bool validanome(char *nome)
 
     for (int i = 0; i < Numamigo; i++)
     {
-        if (strcmp(nome, Listaamigo[i].nome) == 0)
+        if (strcmp(nome, Listaamigo[i].nome) == 0 || strcmp(nome, Listaamigo[i].apelido) == 0)
         {
             return false;
         }
@@ -3356,7 +3348,7 @@ int buscaxnome(int op, char *str)
 
     CLS do
     {
-        printf("Buscando[%s]", str);
+        printf("Buscando por [%s]", str);
         for (int j = 0; j < 3; j++)
         {
             printf(".");
